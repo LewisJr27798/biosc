@@ -17,7 +17,7 @@ def main():
     configure_logging()
 
     # Data preprocessing
-    prep = Preproccesing('Pleiades_GDR3+2MASS+PanSTARRS1+EW_Li.csv', sortPho=False)
+    prep = Preproccesing('Pleiades_GDR3+2MASS+PanSTARRS1+EW_Li.csv', sortPho=False, nStars=20)
     parallax_data = prep.get_parallax()
     Li_data = prep.get_Li()
     m_data = prep.get_magnitude(fillna='max')

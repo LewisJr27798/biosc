@@ -1,0 +1,17 @@
+****bhm.py****
+366 _ = pm.plot_trace(self.idata, var_names = var_names)
+366 _ = az.plot_trace(self.idata, var_names = var_names, figsize=(10, 7))
+###
+170 _ = Li_true = pm.Deterministic('Li*', Li[:, 0]*3.3) # [L_0] = 3.3
+170 _ = Li_true = pm.Deterministic('Li*', np.log10(Li[:, 0]) + 3.3) # [L_0] = 3.3
+###
+(all code)
+'age' -> 'Age [Myr]' (priors, idata)
+'distance' -> 'Distance [pc]' (priors, idata)
+'Li' -> 'A(Li) [dex]' (priors, idata)
+'parallax' -> 'Parallax [mas]' (priors, idata)
+'flux' -> 'flux [erg s${-1}$ cm$^{-2}$]' (priors, idata)
+###
+270 _ = s = pm.NUTS()
+270 _ = s = pm.NUTS(target_accept=0.99)
+
