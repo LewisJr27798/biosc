@@ -96,25 +96,25 @@ class BayesianModel:
             ##########
             m_lower = 1e-2 # lower mass limit (in solar masses) given by BT-Settl
             m_upper = 1.5  # upper mass limit (in solar masses) given by BT-Settl
-            mass = pm.Uniform('mass', lower=m_lower, upper=m_upper, shape = self.nStars)
+            mass = pm.Uniform(r'Mass [$M_{\odot}$]', lower=m_lower, upper=m_upper, shape = self.nStars)
 
             # Age
-            if 'age' in priors.keys():
-                if priors['age']['dist'] == 'normal':
-                    age = pm.Normal('age', mu = priors['age']['mu'], sigma = priors['age']['sigma'])
-                elif priors['age']['dist'] == 'uniform':
-                    age = pm.Uniform('age', upper = priors['age']['upper'], lower = priors['age']['lower'])
+            if 'Age [Myr]' in priors.keys():
+                if priors['Age [Myr]']['dist'] == 'normal':
+                    age = pm.Normal('Age [Myr]', mu = priors['Age [Myr]']['mu'], sigma = priors['Age [Myr]']['sigma'])
+                elif priors['Age [Myr]']['dist'] == 'uniform':
+                    age = pm.Uniform('Age [Myr]', upper = priors['Age [Myr]']['upper'], lower = priors['Age [Myr]']['lower'])
                 else: 
                     raise KeyError('Unknown age prior distribution')
             else:
                 raise KeyError('Please, provide a prior for age')
             
             # Distance
-            if 'distance' in priors.keys():
-                if priors['distance']['dist'] == 'normal':
-                    distance = pm.Normal('distance', mu = priors['distance']['mu'], sigma = priors['distance']['sigma'], shape = self.nStars)
-                elif priors['distance']['dist'] == 'uniform':
-                    distance = pm.Uniform('distance', upper = priors['distance']['upper'], lower = priors['distance']['lower'], shape = self.nStars)
+            if 'Distance [pc]' in priors.keys():
+                if priors['Distance [pc]']['dist'] == 'normal':
+                    distance = pm.Normal('Distance [pc]', mu = priors['Distance [pc]']['mu'], sigma = priors['Distance [pc]']['sigma'], shape = self.nStars)
+                elif priors['Distance [pc]']['dist'] == 'uniform':
+                    distance = pm.Uniform('Distance [pc]', upper = priors['Distance [pc]']['upper'], lower = priors['Distance [pc]']['lower'], shape = self.nStars)
                 else: 
                     raise KeyError('Unknown distance prior distribution')
             elif self.m_data is None:
@@ -178,7 +178,7 @@ class BayesianModel:
             ###############
             if self.parallax_data is not None and not isinstance(self.parallax_data, bool):
                 parallax_data = pm.ConstantData('parallax_data', self.parallax_data['data'])
-                parallax_obs = pm.Normal('parallax', mu=parallax_true, sigma=self.parallax_data['sigma'], observed=parallax_data)
+                parallax_obs = pm.Normal('parallax [mas]', mu=parallax_true, sigma=self.parallax_data['sigma'], observed=parallax_data)
 
             # Photometry
             if self.m_data is not None and not isinstance(self.m_data, bool):
@@ -196,7 +196,7 @@ class BayesianModel:
 
                     # Compute flux mixture likelihood
                     flux_likelihood = dists.MixtureLikelihood(
-                        name='flux', 
+                        name=r'flux [erg s$^{-1}$ cm$^{-2}$]', 
                         size=(self.nStars, 11), 
                         mu=flux_true, 
                         sigma=flux_sigma, 
@@ -208,7 +208,7 @@ class BayesianModel:
                 else:
                     # Compute flux normal likelihood
                     flux_likelihood = dists.NormalLikelihood(
-                        name='flux', 
+                        name=r'flux [erg s$^{-1}$ cm$^{-2}$]', 
                         size=(self.nStars, 11), 
                         mu=flux_true, 
                         sigma=flux_sigma, 
@@ -226,7 +226,7 @@ class BayesianModel:
                 Li_sigma = self.Li_data['sigma'][Li_idx].values
                 if POLi:
                     Li_likelihood = dists.MixtureLikelihood(
-                        name='Li', 
+                        name='A(Li) [dex]', 
                         size=(Li_idx.sum(),), 
                         mu=Li_true[Li_idx], 
                         sigma=Li_sigma, 
@@ -237,7 +237,7 @@ class BayesianModel:
                         Vb=Vb_Li)
                 else:
                     Li_likelihood = dists.NormalLikelihood(
-                        name='Li', 
+                        name='A(Li) [dex]', 
                         size=(Li_idx.sum(),), 
                         mu=Li_true[Li_idx], 
                         sigma=Li_sigma, 
@@ -274,7 +274,7 @@ class BayesianModel:
             with self._model:
                 # Select step method
                 if step == 'NUTS':
-                    s = pm.NUTS()
+                    s = pm.NUTS(target_accept=0.99)
                 elif step == 'Metropolis':
                     s = pm.Metropolis()
                 elif step == 'HamiltonianMC':
@@ -355,7 +355,7 @@ class BayesianModel:
         """
         self.idata = az.from_netcdf(os.path.join(dir, filename))
         
-    def plot_trace(self, var_names : list = ['age', 'distance']):
+    def plot_trace(self, var_names : list = ['Age [Myr]', 'Distance [pc]']):
         """Plot inference data trace.
         
         Parameters
@@ -363,7 +363,7 @@ class BayesianModel:
         var_names : list
             Model variables to be plotted.
         """
-        _ = pm.plot_trace(self.idata, var_names = var_names)
+        _ = az.plot_trace(self.idata, var_names = var_names, figsize=(10, 7))
 
     def generate_data(self, mode : str = 'dist') -> dict:
         """Generate synthetic data.
@@ -456,9 +456,9 @@ class BayesianModel:
 
         # Age that generate the data
         if mode == 'cte':
-            data['age'] = self.prior_predictive.prior['age'][0, 0]
+            data['Age [Myr]'] = self.prior_predictive.prior['Age [Myr]'][0, 0]
         elif mode == 'dist':
-            data['age'] = self.prior_predictive.prior['age'][0, idx]
+            data['Age [Myr]'] = self.prior_predictive.prior['Age [Myr]'][0, idx]
 
         return data
     
@@ -468,7 +468,7 @@ class BayesianModel:
         if kind == 'age':
             try:
                 # Plot generative model age distribution
-                sns.kdeplot(data['age'], ax=ax, fill=True, color = 'orange', label='Generative model')
+                sns.kdeplot(data['Age [Myr]'], ax=ax, fill=True, color = 'orange', label='Generative model')
             except:
                 # Real-world data
                 pass
@@ -477,7 +477,7 @@ class BayesianModel:
             threshold = 1.5
 
             # Compute mean
-            mu = self.idata.posterior['age'].mean(axis=1)
+            mu = self.idata.posterior['Age [Myr]'].mean(axis=1)
             c = -1
             l = False
             for x in mu:
@@ -490,9 +490,9 @@ class BayesianModel:
                 # Clip chains with z-score < threshold
                 if z_score < threshold:
                     if l:
-                        sns.kdeplot(self.idata.posterior['age'][c], ax=ax, fill=True, color = 'blue')
+                        sns.kdeplot(self.idata.posterior['Age [Myr]'][c], ax=ax, fill=True, color = 'blue')
                     else:
-                        sns.kdeplot(self.idata.posterior['age'][c], ax=ax, fill=True, color = 'blue', label=f"chains")
+                        sns.kdeplot(self.idata.posterior['Age [Myr]'][c], ax=ax, fill=True, color = 'blue', label=f"chains")
                         l = True
 
         elif kind == 'CMDiagram':
@@ -531,8 +531,8 @@ class BayesianModel:
 
             # Posterior predictive
             try:
-                m = flux2m(self.idata.posterior_predictive['flux'].to_numpy())
-                p = self.idata.posterior_predictive['parallax'].to_numpy()
+                m = flux2m(self.idata.posterior_predictive[r'flux [erg s$^{-1}$ cm$^{-2}$]'].to_numpy())
+                p = self.idata.posterior_predictive['parallax [mas]'].to_numpy()
                 def computeM(m, p):
                     for i in range(11):
                             parallax_v = [p for _ in range(11)]
@@ -540,7 +540,7 @@ class BayesianModel:
                     return m + 5*(np.log10(parallax/1000)+1)
                 lppc = False
 
-                for s in range(self.idata.posterior_predictive['flux'].shape[1]):
+                for s in range(self.idata.posterior_predictive[r'flux [erg s$^{-1}$ cm$^{-2}$]'].shape[1]):
                     M_ppc = pd.DataFrame(computeM(m, p)[0, s], columns = self.filters)
                     M_ppc = createX(M_ppc, x)
                     if lppc:
@@ -558,11 +558,11 @@ class BayesianModel:
     def plot_QQ(self, var_name : str, fig, ax):
         """Quantile-Quantile plot."""
 
-        if var_name in ['parallax', 'Li']:
+        if var_name in ['parallax [mas]', 'A(Li) [dex]']:
             # Store observed and simulated data
-            if var_name == 'parallax':
+            if var_name == 'parallax [mas]':
                 q_obs= self.parallax_data['data'].values
-            elif var_name == 'Li':
+            elif var_name == 'A(Li) [dex]':
                 q_obs= self.Li_data['data'].values
             q_ppc = self.idata.posterior_predictive[var_name][0].mean(axis=0)
 
@@ -588,16 +588,16 @@ class BayesianModel:
         """DEPRECATED"""
         fig, axs = plt.subplots(2, 1, figsize=(10, 9), sharex=True, gridspec_kw={'height_ratios': [2.5, 1]})
         axs[0].invert_yaxis()
-        if self.priors['age']['dist'] == 'normal':
+        if self.priors['Age [Myr]']['dist'] == 'normal':
             fig.suptitle(
                 r'$p(age|I)$ ~ $\mathcal{{N}}(\mu = {mu}, \sigma = {sigma})$ Myr'.format(
-                mu=self.priors['age']['mu'], 
-                sigma=self.priors['age']['sigma']))
-        elif self.priors['age']['dist'] == 'uniform':
+                mu=self.priors['Age [Myr]']['mu'], 
+                sigma=self.priors['Age [Myr]']['sigma']))
+        elif self.priors['Age [Myr]']['dist'] == 'uniform':
                         fig.suptitle(
                 r'$p(age|I)$ ~ $\mathcal{{U}}(a = {a}, b = {b})$ Myr'.format(
-                a=self.priors['age']['lower'], 
-                b=self.priors['age']['upper']))
+                a=self.priors['Age [Myr]']['lower'], 
+                b=self.priors['Age [Myr]']['upper']))
         
         # CM Diagram
         axs[0].set_xlabel(r'$G$ - $G_{rp}$')
