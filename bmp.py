@@ -289,7 +289,7 @@ class BayesianModelPlots:
             ax.set_xlabel(f'G-{band} [mag]')
             ax.set_ylabel(f'{band} [mag]')
             ax.invert_yaxis()
-            if band not in ['BP', 'r']:
+            if band in ['BP', 'r']:
                 ax.invert_xaxis()
 
     def plot_model(self, ax, diff_model, data_model_pd, band, model_Li_isochrones, ages, colors,
@@ -344,5 +344,5 @@ class BayesianModelPlots:
         ax.set_xlabel(f'G-{band} [mag]')
         ax.set_ylabel(f'{band} [mag]')
         ax.invert_yaxis()
-        if band not in ['BP', 'r']:
+        if band in ['BP', 'r']:
             ax.invert_xaxis()
