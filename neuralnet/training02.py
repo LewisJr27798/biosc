@@ -1,10 +1,14 @@
 import functools
 import numpy as np
 import matplotlib.pyplot as plt
-
-import evidential_deep_learning as edl
+import sys
 import tensorflow as tf
-from tensorflow import keras
+
+from tensorflow.keras.layers import Dense, Input
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.utils import plot_model
+import evidential_deep_learning as edl
+
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split, KFold
@@ -27,17 +31,58 @@ targets = [
 X = np.array(BTSettl[inputs])
 Y = np.array(BTSettl[targets])
 
+pd.Series(Y.flatten()).describe()
+
 # Split into train and test datasets
 X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, shuffle=True)
 
-# Split outputs
-Li_train = Y_train[:, 0]
-Li_test = Y_test[:, 0]
+
+# plt.title("Inputs variables distribution")
+# plt.boxplot(X_train, labels=["age_Myr", "M/Ms"])
+# plt.show()
+#
+# plt.title("outputs variables distribution")
+# plt.boxplot(Y_train)
+# plt.show()
+
+model = Sequential(
+    [
+        Input(shape=(2,)),
+        Dense(64, activation="relu"),
+        Dense(64, activation="relu"),
+        edl.layers.DenseNormalGamma(1),
+    ]
+)
 
 
-plt.title("Inputs variables distribution")
-plt.boxplot(X_train, labels=["age_Myr", "M/Ms"])
-plt.show()
+plot_model(model, to_file="model_plot.png", show_shapes=True, show_layer_names=True)
+#
+
+
+def EvidentialRegressionLoss(true, pred):
+    return edl.losses.EvidentialRegression(true, pred, coeff=1e-2)
+
+
+model.compile(
+    optimizer=tf.keras.optimizers.Adam(1e-3),
+    loss=edl.losses.EvidentialRegression,  # Evidential loss!
+)
+
+# model.compile(optimizer=tf.keras.optimizers.Adam(5e-4), loss=EvidentialRegressionLoss)
+
+model.fit(X_train, Y_train, batch_size=10, epochs=500)
+
+Y_pred = model(X_test)
+
+mu, v, alpha, beta = tf.split(Y_pred, 4, axis=-1)
+mu = mu[:, 0]
+var = np.sqrt(beta / (v * (alpha - 1)))
+var = np.minimum(var, 1e3)[:, 0]  # for visualization
+
+print(mu)
+print(var)
+
+sys.exit()
 
 
 def main():
@@ -49,7 +94,7 @@ def main():
     model = tf.keras.Sequential()
     model.add(tf.keras.layers.Input(shape=(2,), name="Age, Mass", activation="relu"))
     model.add(tf.keras.layers.Dense(64, activation="relu"))
-    model.add((tf.keras.layers.Dense(64, activation="relu"))
+    model.add(tf.keras.layers.Dense(64, activation="relu"))
     model.add(edl.layers.DenseNormalGamma(1))
 
     # Custom loss function to handle the custom regularizer coefficient
@@ -113,15 +158,6 @@ def plot_predictions(x_train, y_train, x_test, y_test, y_pred, n_stds=4, kk=0):
 
 if __name__ == "__main__":
     main()
-
-model = tf.keras.Sequential()
-model.add(tf.keras.layers.Input(shape=(2,), name="Age, Mass"))
-model.add(tf.keras.layers.Dense(64, activation="relu"))
-model.add(tf.keras.layers.Dense(64, activation="relu"))
-model.add(edl.layers.DenseNormalGamma(1))
-
-
-
 
 
 # Instanciate and compile model
