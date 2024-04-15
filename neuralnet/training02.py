@@ -45,32 +45,30 @@ X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, shuffle
 # plt.boxplot(Y_train)
 # plt.show()
 
-model = Sequential(
+model2 = Sequential(
     [
-        Input(shape=(2,)),
-        Dense(64, activation="relu"),
-        Dense(64, activation="relu"),
+        # Input(shape=(2,), name="Age, Mass"),
+        Dense(64, activation="relu", name="HL1"),
+        Dense(64, activation="relu", name="HL2"),
         edl.layers.DenseNormalGamma(1),
     ]
 )
 
 
 plot_model(model, to_file="model_plot.png", show_shapes=True, show_layer_names=True)
-#
 
 
 def EvidentialRegressionLoss(true, pred):
     return edl.losses.EvidentialRegression(true, pred, coeff=1e-2)
 
 
-model.compile(
+model2.compile(
     optimizer=tf.keras.optimizers.Adam(1e-3),
     loss=edl.losses.EvidentialRegression,  # Evidential loss!
 )
 
-# model.compile(optimizer=tf.keras.optimizers.Adam(5e-4), loss=EvidentialRegressionLoss)
 
-model.fit(X_train, Y_train, batch_size=10, epochs=500)
+model2.fit(X_train, Y_train, batch_size=10, epochs=10)
 
 Y_pred = model(X_test)
 
@@ -79,8 +77,8 @@ mu = mu[:, 0]
 var = np.sqrt(beta / (v * (alpha - 1)))
 var = np.minimum(var, 1e3)[:, 0]  # for visualization
 
-print(mu)
-print(var)
+# pd.DataFrame({"mu":mu,
+#               "var":var}).plot.scatter(x="mu", y="var")
 
 sys.exit()
 
