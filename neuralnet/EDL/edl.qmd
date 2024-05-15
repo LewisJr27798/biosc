@@ -1,0 +1,58 @@
+---
+title: "EDL for regression"
+format: revealjs
+---
+
+## Intro
+
+Check the repo [Evidential Deep Learning](https://github.com/aamini/evidential-deep-learning)
+
+Check the paper [Deep Evidential Regression](https://proceedings.neurips.cc/paper/2020/file/aab085461de182608ee9f607f3f7d18f-Paper.pdf)
+
+## Intro
+
+![The idea](figures/edl_intro.png)
+
+## Uncertainties
+
+![Epistemic and aleatoric Uncertainties](figures/edl_uncertainties_mu_sigma.png)
+
+## Setup
+
+![](figures/edl_setup01.png)
+![](figures/edl_setup02.png)
+
+## Learning. Maximizing the model fit
+
+![](figures/edl_learning01.png)
+
+## Learning. Minimizing evidence errors
+
+![](figures/edl_learning02.png)
+
+## Learning
+
+![](figures/edl_learning03.png)
+
+## Coding
+
+```{python}
+#| echo: true
+#| eval: false
+#| code-line-numbers: "8|13"
+import evidential_deep_learning as edl
+import tensorflow as tf
+
+model = tf.keras.Sequential(
+    [
+        tf.keras.layers.Dense(64, activation="relu"),
+        tf.keras.layers.Dense(64, activation="relu"),
+        edl.layers.DenseNormalGamma(1), # Evidential distribution!
+    ]
+)
+model.compile(
+    optimizer=tf.keras.optimizers.Adam(1e-3), 
+    loss=edl.losses.EvidentialRegression # Evidential loss!
+)
+```
+
