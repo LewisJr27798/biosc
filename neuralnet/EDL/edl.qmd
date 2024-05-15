@@ -39,7 +39,7 @@ Check the paper [Deep Evidential Regression](https://proceedings.neurips.cc/pape
 ```{python}
 #| echo: true
 #| eval: false
-#| code-line-numbers: "8|13"
+#| code-line-numbers: "8|13 "
 import evidential_deep_learning as edl
 import tensorflow as tf
 
