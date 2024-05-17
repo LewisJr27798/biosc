@@ -55,7 +55,7 @@ model2 = Sequential(
 )
 
 
-plot_model(model, to_file="model_plot.png", show_shapes=True, show_layer_names=True)
+plot_model(model2, to_file="model_plot.png", show_shapes=True, show_layer_names=True)
 
 
 def EvidentialRegressionLoss(true, pred):
