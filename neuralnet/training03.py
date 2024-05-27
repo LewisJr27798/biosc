@@ -4,6 +4,14 @@ from sklearn.metrics import PredictionErrorDisplay
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.models import Sequential
 
+import sys
+
+sys.path.insert(1, "/home/angel/gitrepos/biosc/biosc")
+from neuralnet import NeuralNetwork, Scaler
+
+# Scaler pipeline
+scaler01 = Scaler()
+
 import tensorflow as tf
 import pandas as pd
 import numpy as np
@@ -34,6 +42,8 @@ y_scaled = scaler.fit_transform(y)
 # ENTRENAMIENTO
 
 X_train, X_test, y_train, y_test = train_test_split(X_scaled, y_scaled, test_size=0.25)
+
+# sys.exit()
 
 
 def EvidentialRegressionLoss(true, pred):
@@ -98,6 +108,41 @@ axs[1].set_title("Residuals vs. Predicted Values")
 fig.suptitle("Plotting cross-validated predictions")
 fig.savefig("edl_Li.png")
 plt.close()
+
+# Comparing with pre-trained NN in biosc
+age, mass = scaler.inverse(X_test)
+inputs = scaler01.transform(age, mass)
+
+# Instantiate Pre-Trained Neural Network (BT-Settl)
+nnet = NeuralNetwork()
+
+# Neural Network predictions
+y_pred, Pho = nnet.predict(inputs.T)
+
+fig, axs = plt.subplots(ncols=2, figsize=(8, 4))
+PredictionErrorDisplay.from_predictions(
+    y_test.flatten(),
+    y_pred=y_pred,
+    kind="actual_vs_predicted",
+    # subsample=100,
+    ax=axs[0],
+    # random_state=0,
+)
+axs[0].set_title("Actual vs. Predicted values")
+PredictionErrorDisplay.from_predictions(
+    y_test.flatten(),
+    y_pred=y_pred,
+    kind="residual_vs_predicted",
+    # subsample=100,
+    ax=axs[1],
+    # random_state=0,
+)
+axs[1].set_title("Residuals vs. Predicted Values")
+
+fig.suptitle("Plotting cross-validated predictions")
+fig.savefig("edl_Li.png")
+plt.close()
+
 
 # plt.scatter(y_test, mu)
 # plt.xlabel("Actual Li")
