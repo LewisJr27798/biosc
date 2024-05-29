@@ -1,10 +1,12 @@
 """Pre-Trained Neural Network as BT-Settl model interpolator. PyTensor implementation."""
+
 import os
 from pickle import load
 import numpy as np
 import pymc as pm
 import pytensor.tensor as T
 import warnings
+
 
 def relu(x, alpha=0):
     """
@@ -44,33 +46,37 @@ def relu(x, alpha=0):
         f2 = 0.5 * (1 - alpha)
         return f1 * x + f2 * abs(x)
 
+
 class Scaler:
     """PyTensor implementation of scaler pipeline.
     1. PowerTransform (Box-Cox) <- https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.PowerTransformer.html
     2. MinMaxScaler <- https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html
     """
-    def __init__(self, folder : str = './neuralnet/'):
+
+    def __init__(self, folder: str = "."):
         warnings.filterwarnings("ignore")
         # Load scalers from Pre-Trained Neural Network folder.
         try:
-            with open(os.path.join(folder, 'scalers.pkl'),'rb') as file:
+            with open(os.path.join(folder, "scalers.pkl"), "rb") as file:
                 scalers = load(file)
         except FileNotFoundError as error:
-            raise FileNotFoundError("The file containing scalers cannot be found. Please, provide a valid path") from error
+            raise FileNotFoundError(
+                "The file containing scalers cannot be found. Please, provide a valid path"
+            ) from error
         else:
             self.BoxCox = scalers[0]
             self.MinMax = scalers[1]
-    
+
     def transform(self, age, mass):
         """Transform age and mass into scaled inputs.
 
         Parameters
         ----------
         age : Tensor (pytensor)
-            Open cluster age. Units: [Myr] 
+            Open cluster age. Units: [Myr]
         mass : Tensor (pytensor)
             Mass for each star. Units: [Ms]
-        
+
         Returns
         -------
         inputs : Tensor (pytensor)
@@ -85,31 +91,35 @@ class Scaler:
 
         # BoxCox transformation
         lamb = np.array(self.BoxCox.lambdas_).reshape(-1, 1)
-        x = T.switch(T.neq(lamb, 0), (inputs ** lamb - 1) / lamb, T.log(inputs))
+        x = T.switch(T.neq(lamb, 0), (inputs**lamb - 1) / lamb, T.log(inputs))
         # MinMax transformation
         min_val = self.MinMax.data_min_.reshape(-1, 1)
         max_val = self.MinMax.data_max_.reshape(-1, 1)
         return (x - min_val) / (max_val - min_val)
 
+
 class NeuralNetwork:
     """Pre-Trained Neural Network weights and compute the predictions.
     Implementation in PyTensor.
     """
-    def __init__(self, folder : str = './neuralnet/'):
-        """Load optimal weights from Pre-Trained Neural Network folder. 
-        
+
+    def __init__(self, folder: str = "."):
+        """Load optimal weights from Pre-Trained Neural Network folder.
+
         Parameters
         ----------
         folder : str
             Folder containing neural network weights.
         """
-        
+
         # Load weights
         try:
-            with open(os.path.join(folder, 'weights.pkl'), 'rb') as file:
+            with open(os.path.join(folder, "weights.pkl"), "rb") as file:
                 weights = load(file)
         except FileNotFoundError as error:
-            raise FileNotFoundError("The file containing optimal weights cannot be found. Please, provide a valid path") from error
+            raise FileNotFoundError(
+                "The file containing optimal weights cannot be found. Please, provide a valid path"
+            ) from error
         else:
             self.W1 = weights[0]
             self.b1 = weights[1]
@@ -127,9 +137,9 @@ class NeuralNetwork:
         PyTensor implementation.
 
         Parameters
-        ---------- 
-        inputs : Tensor (pytensor)     
-            Scaled age and mass as 2-dimensional tensor. 
+        ----------
+        inputs : Tensor (pytensor)
+            Scaled age and mass as 2-dimensional tensor.
             - age = inputs[0]
             - mass = inputs[1]
 
@@ -152,4 +162,3 @@ class NeuralNetwork:
         Pho = T.dot(A3, self.WPho) + self.bPho
 
         return Li, Pho
-        

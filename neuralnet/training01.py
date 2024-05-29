@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split, KFold
 from sklearn.preprocessing import StandardScaler, MinMaxScaler, PowerTransformer
 from pickle import dump
+import sys
 
 print(f"Running Tensoflow {tf.__version__}")
 
@@ -20,9 +21,8 @@ print(f"Running Tensoflow {tf.__version__}")
 # In[2]:
 
 
-BTSettl = pd.read_csv("../data/BT-Settl_all_Myr_Gaia+2MASS+PanSTARRS.csv")
 # Load data
-# BTSettl = pd.read_csv('..\data\BT-Settl_all_Myr_Gaia+2MASS+PanSTARRS.csv')
+BTSettl = pd.read_csv("../data/BT-Settl_all_Myr_Gaia+2MASS+PanSTARRS.csv")
 inputs = ["age_Myr", "M/Ms"]
 targets = [
     "Li",
@@ -63,16 +63,16 @@ Pho_test = Y_test[:, 1:]
 # In[3]:
 
 
-plt.title("Inputs variables distribution")
-plt.boxplot(X_train, labels=["age_Myr", "M/Ms"])
-plt.show()
-
+# plt.title("Inputs variables distribution")
+# plt.boxplot(X_train, labels=["age_Myr", "M/Ms"])
+# plt.savefig("X_train.png")
+# plt.close()
 
 # In[4]:
 
 
 # Define Neural Network: structure, activation, initializers, etc.
-inputs = layers.Input(shape=(2,), name="Age, Mass")
+inputs = layers.Input(shape=(2,), name="Age_Mass")
 dense = layers.Dense(
     units=64,
     activation="relu",
@@ -97,25 +97,18 @@ dense = layers.Dense(
     bias_initializer=keras.initializers.Zeros(),
     name="HL3",
 )(dense)
-mu_Li = layers.Dense(
+Li = layers.Dense(
     units=1,
     activation="sigmoid",
     kernel_initializer=keras.initializers.GlorotNormal(),
     # use_bias = False,
-    name="mu_Li",
+    name="Li",
 )(dense)
-# Photometry = layers.Dense(
-#     units=11,
-#     # kernel_regularizer = keras.regularizers.L2(0.01),
-#     # bias_regularizer = keras.regularizers.L2(0.01),
-#     name="Photometry",
-# )(dense)
-sigma_Li = layers.Dense(
-    units=1,
-    activation="sigmoid",
-    kernel_initializer=keras.initializers.GlorotNormal(),
-    # use_bias = False,
-    name="sigma_Li",
+Photometry = layers.Dense(
+    units=11,
+    # kernel_regularizer = keras.regularizers.L2(0.01),
+    # bias_regularizer = keras.regularizers.L2(0.01),
+    name="Photometry",
 )(dense)
 
 
@@ -163,7 +156,6 @@ class AliG(tf.keras.optimizers.SGD):
 
 optimizer = AliG(max_lr=0.1)  # , momentum=0.7
 
-
 # In[6]:
 
 
@@ -195,19 +187,17 @@ RMSE = keras.metrics.RootMeanSquaredError()
 
 
 # Instanciate and compile model
-model = keras.Model(inputs=inputs, outputs=[mu_Li, sigma_Li], name="BTSettl")
 model = keras.Model(inputs=inputs, outputs=[Li, Photometry], name="BTSettl")
 model.compile(optimizer=optimizer, loss={"Li": msa, "Photometry": mse}, metrics=[RMSE])
 
-keras.utils.plot_model(
-    model, to_file="model_plot.png", show_shapes=True, show_layer_names=True
-)
+
 # In[9]:
 
 
-model.summary()
+print(model.summary())
 
 
+sys.exit()
 # In[10]:
 
 
