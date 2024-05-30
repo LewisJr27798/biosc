@@ -47,57 +47,6 @@ def relu(x, alpha=0):
         return f1 * x + f2 * abs(x)
 
 
-class Scaler2:
-    """PyTensor implementation of scaler pipeline.
-    1. PowerTransform (Box-Cox) <- https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.PowerTransformer.html
-    2. MinMaxScaler <- https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html
-    """
-
-    def __init__(self, folder: str = "."):
-        warnings.filterwarnings("ignore")
-        # Load scalers from Pre-Trained Neural Network folder.
-        try:
-            with open(os.path.join(folder, "scalers.pkl"), "rb") as file:
-                scalers = load(file)
-        except FileNotFoundError as error:
-            raise FileNotFoundError(
-                "The file containing scalers cannot be found. Please, provide a valid path"
-            ) from error
-        else:
-            self.BoxCox = scalers[0]
-            self.MinMax = scalers[1]
-
-    def transform(self, age, mass):
-        """Transform age and mass into scaled inputs.
-
-        Parameters
-        ----------
-        age : Tensor (pytensor)
-            Open cluster age. Units: [Myr]
-        mass : Tensor (pytensor)
-            Mass for each star. Units: [Ms]
-
-        Returns
-        -------
-        inputs : Tensor (pytensor)
-            2-dimensional tensor after transformations.
-        """
-
-        age = T.as_tensor_variable(age)
-        mass = T.as_tensor_variable(mass)
-
-        # age_v = T.tile(age, mass.type.shape)
-        inputs = T.stack([age, mass])
-
-        # BoxCox transformation
-        lamb = np.array(self.BoxCox.lambdas_).reshape(-1, 1)
-        x = T.switch(T.neq(lamb, 0), (inputs**lamb - 1) / lamb, T.log(inputs))
-        # MinMax transformation
-        min_val = self.MinMax.data_min_.reshape(-1, 1)
-        max_val = self.MinMax.data_max_.reshape(-1, 1)
-        return (x - min_val) / (max_val - min_val)
-
-
 class Scaler:
     """PyTensor implementation of scaler pipeline.
     1. PowerTransform (Box-Cox) <- https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.PowerTransformer.html
