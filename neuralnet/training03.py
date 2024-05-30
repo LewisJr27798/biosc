@@ -152,7 +152,22 @@ fig.savefig("NN_Li.png")
 plt.close()
 
 
-
+# plt.scatter(y_test, mu)
+# plt.xlabel("Actual Li")
+# plt.ylabel("Predicted Li")
+# plt.title("Actual vs Predicted Li")
+# plt.savefig("actual-predicted-Li.png")
+# plt.close()
+#
+# residuals = y_test.flatten() - mu
+# plt.scatter(mu, residuals)
+# plt.xlabel("Predicted Li")
+# plt.ylabel("Residuals")
+# plt.title("Residual Plot")
+# plt.axhline(y=0, color="r", linestyle="--")
+# plt.savefig("residuals.png")
+# plt.close()
+#
 #
 # model = Sequential(
 #     [
