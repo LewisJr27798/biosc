@@ -155,12 +155,12 @@ model.compile(
 )
 #
 
-print(model.summary())
+# print(model.summary())
 
 history = model.fit(
     X_train,
     [Li_train, Pho_train],
-    epochs=30,
+    epochs=20000,
     batch_size=16,
     verbose=0,
 )
@@ -175,36 +175,41 @@ axs.plot(iters, loss, label="Total loss")
 fig.savefig("loss.png")
 plt.close()
 
-sys.exit()
-# Plot loss vs. iter
-loss = history.history["loss"]
-val = history.history["val_loss"]
-Li_loss = history.history["Li_loss"]
-Li_val = history.history["val_Li_loss"]
-Photometry_loss = history.history["Photometry_loss"]
-Photometry_val = history.history["val_Photometry_loss"]
-iters = range(len(loss))
+# sys.exit()
+param_pred = model.predict(X_test)
+y_pred, v, alpha, beta = tf.split(param_pred[0], 4, axis=-1)
 
-fig, axs = plt.subplots(3, 1, figsize=(15, 10))
-fig.suptitle("Training vs. evaluation loss")
-axs[0].set_title("Total loss")
-axs[0].set_ylabel("log(msa)")
-axs[0].plot(iters, loss, label="Total cost", zorder=1)
-axs[0].plot(iters, val, label="Total val cost", zorder=0)
-axs[0].set_yscale("log")
-axs[0].legend()
-axs[1].set_title("Lithium loss")
-axs[1].plot(iters, Li_loss, label="Training", zorder=1)
-axs[1].plot(iters, Li_val, label="Validation", zorder=0)
-axs[1].legend()
-axs[1].set_yscale("log")
-axs[1].set_ylabel("log(mse)")
-axs[2].set_title("Photometry loss")
-axs[2].plot(iters, Photometry_loss, label="Training", zorder=1)
-axs[2].plot(iters, Photometry_val, label="Validation", zorder=0)
-axs[2].set_xlabel("iter")
-axs[2].set_ylabel("log(mse)")
-axs[2].set_yscale("log")
-axs[2].legend()
-fig.savefig("loss.png")
+# y_pred = y_pred.flatten()
+var = np.sqrt(beta / (v * (alpha - 1)))
+var = np.minimum(var, 1e3)[:, 0]  # for visualization
+
+# print(Li_test.shape)
+# print(y_pred.shape)
+# print(var.shape)
+# sys.exit()
+
+fig, axs = plt.subplots(ncols=2, figsize=(8, 4))
+PredictionErrorDisplay.from_predictions(
+    Li_test,
+    y_pred=y_pred[:, 0],
+    kind="actual_vs_predicted",
+    # subsample=100,
+    ax=axs[0],
+    # random_state=0,
+)
+axs[0].errorbar(y_pred[:, 0], Li_test, xerr=np.sqrt(var), fmt=".")
+
+axs[0].set_title("Actual vs. Predicted values")
+PredictionErrorDisplay.from_predictions(
+    Li_test,
+    y_pred=y_pred[:, 0],
+    kind="residual_vs_predicted",
+    # subsample=100,
+    ax=axs[1],
+    # random_state=0,
+)
+axs[1].set_title("Residuals vs. Predicted Values")
+
+# fig.suptitle("Plotting cross-validated predictions")
+fig.savefig("edl_Li.png")
 plt.close()
