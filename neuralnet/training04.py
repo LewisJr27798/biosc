@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # coding: utf-8
 
 # In[1]:
@@ -7,8 +6,9 @@
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
-from tensorflow.keras.layers import Dense
-from tensorflow.keras.models import Sequential
+
+# from tensorflow.keras.layers import Dense
+# from tensorflow.keras.models import Sequential
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -160,7 +160,7 @@ model.compile(
 history = model.fit(
     X_train,
     [Li_train, Pho_train],
-    epochs=20000,
+    epochs=200,
     batch_size=16,
     verbose=0,
 )
@@ -213,3 +213,12 @@ axs[1].set_title("Residuals vs. Predicted Values")
 # fig.suptitle("Plotting cross-validated predictions")
 fig.savefig("edl_Li.png")
 plt.close()
+
+# # Get optimal values
+weights = model.get_weights()
+
+# Save optimal values
+dump(weights, open("weights_edl.pkl", "wb"))
+
+# Save scalers
+dump(scalers, open("scalers_edl.pkl", "wb"))
