@@ -1,32 +1,18 @@
-# coding: utf-8
+#!/apps/software/Anaconda3/2022.05/envs/tensorflow-gpu/bin/python
 
-# In[1]:
-
-
-import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
-
-# from tensorflow.keras.layers import Dense
-# from tensorflow.keras.models import Sequential
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split, KFold
 from sklearn.preprocessing import StandardScaler, MinMaxScaler, PowerTransformer
 from pickle import dump
-import sys
+from sklearn.metrics import PredictionErrorDisplay
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import tensorflow as tf
 import evidential_deep_learning as edl
 
-# import torch
-# from alig.tf import AliG
-from sklearn.metrics import PredictionErrorDisplay
-
 print(f"Running Tensoflow {tf.__version__}")
-
-
-# In[2]:
-
 
 # Load data
 BTSettl = pd.read_csv("../data/BT-Settl_all_Myr_Gaia+2MASS+PanSTARRS.csv")
@@ -71,7 +57,7 @@ inputs = layers.Input(shape=(2,), name="Age_Mass")
 dense = layers.Dense(
     units=64,
     activation="relu",
-    kernel_initializer=keras.initializers.HeNormal(),
+    kernel_initializer=keras.initializers.he_normal(),
     # kernel_regularizer = keras.regularizers.L2(0.01),
     bias_initializer=keras.initializers.Zeros(),
     name="HL1",
@@ -79,7 +65,7 @@ dense = layers.Dense(
 dense = layers.Dense(
     units=64,
     activation="relu",
-    kernel_initializer=keras.initializers.HeNormal(),
+    kernel_initializer=keras.initializers.he_normal(),
     # kernel_regularizer = keras.regularizers.L2(0.01),
     bias_initializer=keras.initializers.Zeros(),
     name="HL2",
@@ -87,7 +73,7 @@ dense = layers.Dense(
 dense = layers.Dense(
     units=64,
     activation="relu",
-    kernel_initializer=keras.initializers.HeNormal(),
+    kernel_initializer=keras.initializers.he_normal(),
     # kernel_regularizer = keras.regularizers.L2(0.01),
     bias_initializer=keras.initializers.Zeros(),
     name="HL3",
@@ -111,8 +97,6 @@ Photometry = edl.layers.DenseNormalGamma(11)(dense)  # Evidential distribution!
 #
 optimizer = tf.keras.optimizers.SGD(learning_rate=0.01)
 
-# # In[6]:
-
 # # Define Huber loss
 # huber = keras.losses.Huber()
 #
@@ -130,8 +114,6 @@ mse = keras.losses.MeanSquaredError()
 #     return alpha * mse(y_true, y_pred)
 #
 #
-# # In[7]:
-#
 # edl_loss = edl.losses.EvidentialRegression  # Evidential loss!
 # Custom loss function to handle the custom regularizer coefficient
 
@@ -141,26 +123,20 @@ def EvidentialRegressionLoss(true, pred):
 
 
 # Set metrics
-RMSE = keras.metrics.RootMeanSquaredError()
-#
-#
-# # In[8]:
-#
-#
-# # Instanciate and compile model
+# RMSE = keras.metrics.RootMeanSquaredError()
+
+# Instanciate and compile model
 model = keras.Model(inputs=inputs, outputs=[Li, Photometry], name="BTSettl")
 model.compile(
     optimizer=optimizer,
     loss=EvidentialRegressionLoss,
 )
-#
-
 # print(model.summary())
 
 history = model.fit(
     X_train,
     [Li_train, Pho_train],
-    epochs=200,
+    epochs=50000,
     batch_size=16,
     verbose=0,
 )

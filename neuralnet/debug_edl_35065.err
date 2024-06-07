@@ -1,0 +1,7 @@
+2024-06-06 20:11:53.801261: W tensorflow/stream_executor/platform/default/dso_loader.cc:55] Could not load dynamic library 'libcuda.so.1'; dlerror: libcuda.so.1: cannot open shared object file: No such file or directory; LD_LIBRARY_PATH: /apps/software/CUDA/12.0.0/nvvm/lib64:/apps/software/CUDA/12.0.0/extras/CUPTI/lib64:/apps/software/CUDA/12.0.0/lib
+2024-06-06 20:11:53.805566: E tensorflow/stream_executor/cuda/cuda_driver.cc:313] failed call to cuInit: UNKNOWN ERROR (303)
+2024-06-06 20:11:53.806425: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:156] kernel driver does not appear to be running on this host (urc20): /proc/driver/nvidia/version does not exist
+2024-06-06 20:11:53.811594: I tensorflow/core/platform/cpu_feature_guard.cc:143] Your CPU supports instructions that this TensorFlow binary was not compiled to use: SSE4.1 SSE4.2 AVX AVX2 AVX512F FMA
+2024-06-06 20:11:53.962845: I tensorflow/core/platform/profile_utils/cpu_utils.cc:102] CPU Frequency: 2600000000 Hz
+2024-06-06 20:11:53.978489: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x2867090 initialized for platform Host (this does not guarantee that XLA will be used). Devices:
+2024-06-06 20:11:53.978537: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): Host, Default Version

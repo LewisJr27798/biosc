@@ -1,0 +1,7 @@
+== Starting run at jue jun  6 20:08:00 CEST 2024
+== Job ID: 35065
+== Job NPROCS: 1
+== Job NNODES: 1
+== Node list: urc20
+== Submit dir. : /LUSTRE/home/est/u20252421/gitrepos/biosc/neuralnet
+Running Tensoflow 2.2.0
