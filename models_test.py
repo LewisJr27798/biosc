@@ -38,6 +38,10 @@ def pc(string):
         path_all = '/pcdisk/dalen/lgonzalez/OneDrive/Escritorio/CAB_INTA-CSIC/01-Doctorado/013-Jupyter/0134-biosc_env/'
     return path_all
 
+def pc_other(string_dir):
+    path_all = string_dir
+    return path_all
+
 def select_nearest_age(dic, desired_age):
     """
     Args:
@@ -408,6 +412,11 @@ class Models:
                 dataframe['BP-RP'] = dataframe['BP_abs'] - dataframe['RP_abs']
                 dataframe['G-J'] = dataframe['G_abs'] - dataframe['J_abs']
                 dataframe['G-RP'] = dataframe['G_abs'] - dataframe['RP_abs']
+                dataframe['J-H'] = dataframe['J_abs'] - dataframe['H_abs']
+                dataframe['H-K'] = dataframe['H_abs'] - dataframe['K_abs']
+                dataframe['G-H'] = dataframe['H_abs'] - dataframe['H_abs']
+                dataframe['G-K'] = dataframe['G_abs'] - dataframe['K_abs']
+                dataframe['G-V'] = dataframe['G_abs'] - dataframe['V_mag']
                 with np.errstate(divide='ignore', invalid='ignore'):
                     dataframe['A(Li)'] = np.log10(dataframe['Li/Li0']) + 3.3
                 dataframe['Lsun'] = 10**dataframe['log(L/Lsun)']
@@ -614,6 +623,10 @@ class PlotAnalyzer:
         -x, y, e_x, e_y: x, y median values of posterior distributions with sigma.
             
         """
+        
+        plt.rcParams.update({'font.size': 11, 'axes.linewidth': 1, 'axes.edgecolor': 'k'})
+        plt.rcParams['font.family'] = 'serif'
+        
         age_array = SPOTS['00'].keys()
         age = self.find_closest_age(age_array, age_iso)
         start_time = time.time()
@@ -698,6 +711,10 @@ class PlotAnalyzer:
         -SPOTS_ISO: SPOTS mixture isochrone.
         
         """
+        
+        plt.rcParams.update({'font.size': 11, 'axes.linewidth': 1, 'axes.edgecolor': 'k'})
+        plt.rcParams['font.family'] = 'serif'
+        
         age_array = SPOTS['00'].keys()
         age = self.find_closest_age(age_array, age_iso)
         start_time = time.time()
@@ -804,6 +821,10 @@ class PlotAnalyzer:
         ... in Teff.  
         
         """
+        
+        plt.rcParams.update({'font.size': 11, 'axes.linewidth': 1, 'axes.edgecolor': 'k'})
+        plt.rcParams['font.family'] = 'serif'
+        
         age_array = SPOTS['00'].keys()
         age = self.find_closest_age(age_array, age_iso)
         start_time = time.time()
@@ -851,7 +872,7 @@ class PlotAnalyzer:
             age_Myr = age*1000
             ax.plot(self.SPOTS_edr3[f][age]['Teff'], self.SPOTS_edr3[f][age]['log(L/Lsun)'], label='SPOTS-YBC f0'+f+f'; {age_Myr} Myr', color=self.get_color_gradient(num_steps, step), linewidth=1, linestyle='--')
             step = step + 1
-        ax.scatter(data_obs['Teff'], data_obs['log(L/Lsun)'], s=10, zorder=0, color='r', alpha=0.125)
+        ax.scatter(data_obs['Teff_x'], data_obs['log(L/Lsun)'], s=10, zorder=0, color='r', alpha=0.125)
         for x in interval_x_Teff:
             ax.axvline(x, color='gray', linestyle='--', linewidth=0.5, zorder=0)
         x_median_array_Teff = []
@@ -871,6 +892,7 @@ class PlotAnalyzer:
         ax.fill_between(np.sort(x_median_array_Teff), np.sort(np.array(y_median_array_Teff) + np.array(e_y_median_array_Teff)), np.sort(np.array(y_median_array_Teff) - np.array(e_y_median_array_Teff)), color='yellow', alpha=0.35, zorder=4, label=r'$\sigma_G$')
         ax.fill_between(np.sort(x_median_array_Teff), np.sort(np.array(y_median_array_Teff) + 3*np.array(e_y_median_array_Teff)), np.sort(np.array(y_median_array_Teff) - 3*np.array(e_y_median_array_Teff)), color='orange', alpha=0.25, zorder=3, label=r'$3\sigma_G$')
         ax.legend(fontsize=12, loc='upper center', bbox_to_anchor=(1.25, 0.9))
+        ax.set_xlim(1500, 7000)
         ax.invert_xaxis()
         end_time = time.time()
         execution_time = end_time - start_time
@@ -890,6 +912,10 @@ class PlotAnalyzer:
         -SPOTS_ISO: SPOTS mixture isochrone in Teff.
         
         """
+        
+        plt.rcParams.update({'font.size': 11, 'axes.linewidth': 1, 'axes.edgecolor': 'k'})
+        plt.rcParams['font.family'] = 'serif'
+        
         age_array = SPOTS['00'].keys()
         age = self.find_closest_age(age_array, age_iso)
         start_time = time.time()
@@ -968,6 +994,7 @@ class PlotAnalyzer:
         else:
             pass
         ax.legend(fontsize=12, loc='upper center', bbox_to_anchor=(1.35, 0.9))
+        ax.set_xlim(1500, 7000)
         ax.invert_xaxis()
         end_time = time.time()
         execution_time = end_time - start_time
@@ -984,6 +1011,10 @@ class PlotAnalyzer:
         mid value must be test in plots!
 
         """
+        
+        plt.rcParams.update({'font.size': 11, 'axes.linewidth': 1, 'axes.edgecolor': 'k'})
+        plt.rcParams['font.family'] = 'serif'
+        
         
         if type(f_FGK) != str or type(f_UCDs) != str:
             f_FGK = f'{f_FGK}'
@@ -1043,27 +1074,27 @@ class PlotAnalyzer:
         
         ax.legend(fontsize=12, loc='upper center', bbox_to_anchor=(1.25, 0.9))
         
-        ax.set_xlim(2400, 7000)
+        ax.set_xlim(2000, 7000)
         
         ax.invert_xaxis()
         
         return {age: pd.DataFrame({'Teff': SPOTS_Teff_iso, 'log(L/Lsun)': SPOTS_logL_iso})}
     
-    def plot_ages(self, SPOTS, f, minim_age, maxim_age, BTSettl_str=True):
+    def plot_ages(self, SPOTS, f, minim_age, maxim_age, upplim, BTSettl_str=True):
         Teff_max_array_SPOTS = []
         Teff_min_array_SPOTS = []
         age_array_SPOTS = []
-        
+    
         if BTSettl_str == True:
             BTSettl = self.BTSettl_Li_isochrones
         else:
             raise ValueError('BTSettl must be True.')
-            
+    
         if type(f) != str:
             f = f'{f}'
         else:
             pass
-        
+    
         for age in SPOTS[f].keys():
             age_array_SPOTS.append(age)
             Teff_max = max(SPOTS[f][age]['Teff'])
@@ -1082,9 +1113,12 @@ class PlotAnalyzer:
             Teff_max_array_BTSettl.append(Teff_max)
             Teff_min_array_BTSettl.append(Teff_min)
     
+        plt.rcParams.update({'font.size': 11, 'axes.linewidth': 1, 'axes.edgecolor': 'k'})
+        plt.rcParams['font.family'] = 'serif'
+    
         fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8, 4))
     
-        ax1.scatter(Teff_min_array_SPOTS, age_array_SPOTS, s=10, c='r', label=r'$T_{eff,\,min}$ SPOTS-YBC $f=0$', zorder=2)
+        ax1.scatter(Teff_min_array_SPOTS, age_array_SPOTS, s=10, c='r', label=f'$T_{{eff,\,min}}$ SPOTS-YBC $f=0.{f}$', zorder=2)
     
         ax1.scatter(Teff_min_array_BTSettl, age_array_BTSettl, s=10, c='magenta', label=r'$T_{eff,\,min}$ BT-Settl', zorder=2)
     
@@ -1096,12 +1130,12 @@ class PlotAnalyzer:
     
         ax1.set_title(r'$T_{eff}$ range')
     
-        ax1.set_ylim(-0.025, 0.2)
+        ax1.set_ylim(-0.025, upplim)
     
         ax1.axhline(maxim_age, lw=1, ls='-.', c='k', zorder=0, alpha=0.25)
         ax1.axhline(minim_age, lw=1, ls='--', c='k', zorder=0, alpha=0.25)
     
-        ax2.scatter(Teff_max_array_SPOTS, age_array_SPOTS, s=10, c='b', label=r'$T_{eff,\,max}$ SPOTS-YBC $f=0$', zorder=2)
+        ax2.scatter(Teff_max_array_SPOTS, age_array_SPOTS, s=10, c='b', label=f'$T_{{eff,\,min}}$ SPOTS-YBC $f=0.{f}$', zorder=2)
     
         ax2.scatter(Teff_max_array_BTSettl, age_array_BTSettl, s=10, c='orange', label=r'$T_{eff,\,max}$ BT-Settl', zorder=2)
     
@@ -1109,7 +1143,7 @@ class PlotAnalyzer:
     
         ax2.plot(Teff_max_array_BTSettl, age_array_BTSettl, alpha=0.25, c='orange', zorder=1)
     
-        ax2.set_ylim(-0.025, 0.2)
+        ax2.set_ylim(-0.025, upplim)
     
         ax2.axhline(maxim_age, lw=1, ls='-.', c='k', zorder=0, alpha=0.25, label='120 Myr')
         ax2.axhline(minim_age, lw=1, ls='--', c='k', zorder=0, alpha=0.25, label='20 Myr')
@@ -1118,7 +1152,7 @@ class PlotAnalyzer:
     
         ax2.set_xlabel(r'$T_{eff}$ [K]')
     
-        fig.legend(bbox_to_anchor=(1.25, 0.9))
+        fig.legend(bbox_to_anchor=(1.295, 0.9))
     
     
         Teff_max_array_SPOTS = []
@@ -1134,12 +1168,22 @@ class PlotAnalyzer:
                 Teff_series = np.array(SPOTS[f][age]['Teff'])
                 A_Li_series = np.array(SPOTS[f][age]['A(Li)'])
     
-                Teff_min = min(Teff_series)
+                Teff_min_all = min(Teff_series)
     
                 Teff_max = None
+    
                 for i in range(len(Teff_series)):
-                    if A_Li_series[i] == -np.inf and i != 0:
-                        Teff_max = Teff_series[i-1]
+                    if A_Li_series[i] == -np.inf:
+                        Teff_min = Teff_series[i-1]
+                        if i == 0:
+                            Teff_min = Teff_min_all
+                        else:
+                            pass
+                        break
+    
+                for i in range(len(Teff_series)-1, -1, -1):
+                    if A_Li_series[i] == -np.inf:
+                        Teff_max = Teff_series[i+1]
                         break
     
                 if Teff_max is not None:
@@ -1163,12 +1207,18 @@ class PlotAnalyzer:
                 Teff_series = np.array(BTSettl[age]['Teff'])
                 A_Li_series = np.array(BTSettl[age]['A(Li)'])
     
-                Teff_min = min(Teff_series)
+                Teff_min = None
     
                 Teff_max = None
+    
                 for i in range(len(Teff_series)):
                     if A_Li_series[i] == -np.inf:
-                        Teff_max = Teff_series[i-1]
+                        Teff_min = Teff_series[i-1]
+                        break
+    
+                for i in range(len(Teff_series)-1, -1, -1):
+                    if A_Li_series[i] == -np.inf:
+                        Teff_max = Teff_series[i+1]
                         break
     
                 if Teff_max is not None:
@@ -1187,222 +1237,606 @@ class PlotAnalyzer:
             Teff_max_array_BTSettl.append(Teff_max)
             Teff_min_array_BTSettl.append(Teff_min)
     
-        fig, ax = plt.subplots(1, 1, figsize=(8, 2))
+        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8, 4))
     
-        ax.scatter(Teff_min_array_SPOTS, age_array_SPOTS, s=10, c='r', label=r'$T_{eff,\,min}$ SPOTS-YBC $f=0$', zorder=2)
+        ax1.scatter(Teff_min_array_SPOTS, age_array_SPOTS, s=10, c='r', label=f'$T_{{eff,\,min}}$ SPOTS-YBC $f=0.{f}$', zorder=2)
     
-        ax.scatter(Teff_min_array_BTSettl, age_array_BTSettl, s=10, c='orange', label=r'$T_{eff,\,min}$ BT-Settl', zorder=2)
+        ax1.scatter(Teff_min_array_BTSettl, age_array_BTSettl, s=10, c='orange', label=r'$T_{eff,\,min}$ BT-Settl', zorder=2)
     
-        ax.plot(Teff_min_array_BTSettl, age_array_BTSettl, alpha=0.25, c='orange', zorder=1)
+        ax1.plot(Teff_min_array_BTSettl, age_array_BTSettl, alpha=0.25, c='orange', zorder=1)
     
-        ax.plot(Teff_min_array_SPOTS, age_array_SPOTS, alpha=0.25, c='r', zorder=1)
-    
-    
-    
-        ax.scatter(Teff_max_array_BTSettl_Li, age_array_BTSettl_Li, s=10, c='magenta', label=r'$T_{eff,\,max,\,Li}$ BT-Settl', zorder=2)
-    
-        ax.scatter(Teff_max_array_SPOTS_Li, age_array_SPOTS_Li, s=10, c='k', label=r'$T_{eff,\,max,\,Li}$ SPOTS $f=0$', zorder=2)
-    
-        ax.plot(Teff_max_array_BTSettl_Li, age_array_BTSettl_Li, alpha=0.25, c='magenta', zorder=1)
-    
-        ax.plot(Teff_max_array_SPOTS_Li, age_array_SPOTS_Li, alpha=0.25, c='k', zorder=1)
-        
-        
-    
-        ax.set_ylabel('Age [Gyr]')
-    
-        ax.set_title(r'$T_{eff}$ range')
-    
-        ax.set_ylim(-0.025, 0.2)
-    
-        ax.axhline(maxim_age, lw=1, ls='-.', c='k', zorder=0, alpha=0.25, label='120 Myr')
-        ax.axhline(minim_age, lw=1, ls='--', c='k', zorder=0, alpha=0.25, label='20 Myr')
+        ax1.plot(Teff_min_array_SPOTS, age_array_SPOTS, alpha=0.25, c='r', zorder=1)
     
     
-        fig.legend(bbox_to_anchor=(1.25, 0.9))
+        ax1.scatter(Teff_min_array_BTSettl_Li, age_array_BTSettl_Li, s=10, marker='>', c='magenta', label=r'$T_{eff,\,min,\,LDB}$ BT-Settl', zorder=2)
+    
+        ax1.scatter(Teff_min_array_SPOTS_Li, age_array_SPOTS_Li, s=10, marker='>', c='k', label=f'$T_{{eff,\,min,\,LDB}}$ SPOTS-YBC $f={f}$', zorder=2)
+    
+        ax1.plot(Teff_min_array_BTSettl_Li, age_array_BTSettl_Li, alpha=0.25, c='magenta', zorder=1)
+    
+        ax1.plot(Teff_min_array_SPOTS_Li, age_array_SPOTS_Li, alpha=0.25, c='k', zorder=1)
+    
+    
+        ax1.scatter(Teff_max_array_BTSettl_Li, age_array_BTSettl_Li, s=10, marker='<', c='magenta', label=r'$T_{eff,\,max,\,LDB}$ BT-Settl', zorder=2)
+    
+        ax1.scatter(Teff_max_array_SPOTS_Li, age_array_SPOTS_Li, s=10, marker='<', c='k', label=f'$T_{{eff,\,max,\,LDB}}$ SPOTS-YBC $f={f}$', zorder=2)
+    
+        ax1.plot(Teff_max_array_BTSettl_Li, age_array_BTSettl_Li, alpha=0.25, ls='--', c='magenta', zorder=1)
+    
+        ax1.plot(Teff_max_array_SPOTS_Li, age_array_SPOTS_Li, alpha=0.25, ls='--', c='k', zorder=1)
+    
+        ax1.set_xlim(Teff_min_array_SPOTS[0]-500, 5200)
+    
+        ax1.set_ylabel('Age [Gyr]')
+    
+        ax1.set_title(r'$T_{eff}$ range')
+    
+        ax1.set_ylim(-0.025, upplim)
+    
+        ax1.fill_betweenx(age_array_BTSettl_Li, Teff_min_array_BTSettl_Li, Teff_max_array_BTSettl_Li, color='green', alpha=0.1, label='LDB BT-Settl')
+    
+        ax1.fill_betweenx(age_array_SPOTS_Li, Teff_min_array_SPOTS_Li, Teff_max_array_SPOTS_Li, color='magenta', alpha=0.1, label='LDB SPOTS')
+    
+    
+        ax1.axhline(maxim_age, lw=1, ls='-.', c='k', zorder=0, alpha=0.25)
+        ax1.axhline(minim_age, lw=1, ls='--', c='k', zorder=0, alpha=0.25)
+    
+        ax2.scatter(Teff_min_array_SPOTS, age_array_SPOTS, s=10, c='r', zorder=2)
+    
+        ax2.scatter(Teff_min_array_BTSettl, age_array_BTSettl, s=10, c='orange', zorder=2)
+    
+        ax2.plot(Teff_min_array_BTSettl, age_array_BTSettl, alpha=0.25, c='orange', zorder=1)
+    
+        ax2.plot(Teff_min_array_SPOTS, age_array_SPOTS, alpha=0.25, c='r', zorder=1)
+    
+    
+        ax2.scatter(Teff_min_array_BTSettl_Li, age_array_BTSettl_Li, s=10, marker='>', c='magenta', zorder=2)
+    
+        ax2.scatter(Teff_min_array_SPOTS_Li, age_array_SPOTS_Li, s=10, marker='>', c='k', zorder=2)
+    
+        ax2.plot(Teff_min_array_BTSettl_Li, age_array_BTSettl_Li, alpha=0.25, c='magenta', zorder=1)
+    
+        ax2.plot(Teff_min_array_SPOTS_Li, age_array_SPOTS_Li, alpha=0.25, c='k', zorder=1)
+    
+    
+        ax2.scatter(Teff_max_array_BTSettl_Li, age_array_BTSettl_Li, s=10, marker='<', c='magenta', zorder=2)
+    
+        ax2.scatter(Teff_max_array_SPOTS_Li, age_array_SPOTS_Li, s=10, marker='<', c='k', zorder=2)
+    
+        ax2.plot(Teff_max_array_BTSettl_Li, age_array_BTSettl_Li, alpha=0.25, ls='--', c='magenta', zorder=1)
+    
+        ax2.plot(Teff_max_array_SPOTS_Li, age_array_SPOTS_Li, alpha=0.25, ls='--', c='k', zorder=1)
+    
+        ax2.set_xlim(Teff_min_array_SPOTS[0]-500, 3500)
+    
+        ax2.set_ylabel('Age [Gyr]')
+    
+        ax2.set_ylim(-0.025, upplim)
+    
+        ax2.axhline(maxim_age, lw=1, ls='-.', c='k', zorder=0, alpha=0.25, label='120 Myr')
+        ax2.axhline(minim_age, lw=1, ls='--', c='k', zorder=0, alpha=0.25, label='20 Myr')
+    
+    
+        fig.legend(bbox_to_anchor=(1.295, 0.9))
     
 class SPOTS_extended:
-    def __init__(self, MS_color, BTSettl, SPOTS, f):
-        self.MS_color = MS_color
+    def __init__(self, MS_color_file, BTSettl, SPOTS, f_values):
+        self.MS_color_file = MS_color_file
         self.BTSettl = BTSettl
         self.SPOTS = SPOTS
-        self.f = f
+        self.f_values = f_values
 
     @staticmethod
     def find_nearest_index(array, value):
         array = np.asarray(array)
         idx = (np.abs(array - value)).argmin()
         return idx
+    
+    @staticmethod
+    def calculate_log_g(mass, radius):
+        """
+        Calculate the surface gravity log(g) of a star.
+        
+        Parameters:
+        - mass: Mass of the star in solar masses.
+        - radius: Radius of the star in solar radii.
+        
+        Returns:
+        - log_g: The surface gravity log(g) in cgs units.
+        """
+        G = 6.67430e-11  # gravitational constant in m^3 kg^-1 s^-2
+        M_sun = 1.98847e30  # mass of the Sun in kg
+        R_sun = 6.9634e8  # radius of the Sun in meters
+        
+        # Convert mass and radius to SI units
+        mass_kg = mass * M_sun
+        radius_m = radius * R_sun
+        
+        # Calculate g
+        g = G * mass_kg / (radius_m ** 2)
+        
+        # Convert g to cgs units (cm/s^2)
+        g_cgs = g * 100  # 1 m/s^2 = 100 cm/s^2
+        
+        # Calculate log(g)
+        log_g = np.log10(g_cgs)
+        
+        return log_g
+
+    @staticmethod
+    def invert_cmap(cmap):
+        cmap_listed = cmap(np.linspace(0, 1, cmap.N))
+        return cm.colors.ListedColormap(cmap_listed[::-1])
+
 
     def SPOTS_extension(self):
-        '''
-        BTSettl, SPOTS - must be dics
-        MS_color - dataframe for Phot. correction
+        """
+        Extend SPOTS data using provided inputs.
         
-        Pecaut & Mamajek 2013
+        Parameters:
+            MS_color (DataFrame): DataFrame for Phot. correction (Pecaut & Mamajek 2013)
+            BTSettl (dict): Dictionary with BTSettl data.
+            SPOTS (dict): Dictionary with SPOTS data.
+            f (str): Factor value to use.
         
-        SPOTS extended for 1 f factor value at a time.
-        
-        '''
-        
+        Returns:
+            SPOTS_expanded
+        """
         M_bol_sun = 4.755
         Teff_sun = 5772
         
-        Teff_max_array_SPOTS = []
-        Teff_min_array_SPOTS = []
-        age_array_SPOTS = []
-
-        Teff_max_array_SPOTS_Li = []
-        Teff_min_array_SPOTS_Li = []
-        age_array_SPOTS_Li = []
-
-        for age in self.SPOTS.keys():
-            age_array_SPOTS.append(age)
-            Teff_max = max(self.SPOTS[age]['Teff'])
-            Teff_min = min(self.SPOTS[age]['Teff'])
-            Teff_max_array_SPOTS.append(Teff_max)
-            Teff_min_array_SPOTS.append(Teff_min)
-            
-            if age <= 0.6:
-                Teff_series = np.array(self.SPOTS[age]['Teff'])
-                A_Li_series = np.array(self.SPOTS[age]['A(Li)'])
-
-                Teff_min = min(Teff_series)
-
-                Teff_max = None
-                for i in range(len(Teff_series)):
-                    if A_Li_series[i] == -np.inf and i != 0:
-                        Teff_max = Teff_series[i-1]
-                        break
-
-                if Teff_max is not None:
-                    age_array_SPOTS_Li.append(age)
-                    Teff_max_array_SPOTS_Li.append(Teff_max)
-                    Teff_min_array_SPOTS_Li.append(Teff_min)
-        
-        Teff_max_array_BTSettl = []
-        Teff_min_array_BTSettl = []
-        age_array_BTSettl = []
-                    
-        Teff_max_array_BTSettl_Li = []
-        Teff_min_array_BTSettl_Li = []
-        age_array_BTSettl_Li = []
-
-        for age in self.BTSettl.keys():
-            age_array_BTSettl.append(age)
-            Teff_max = max(self.BTSettl[age]['Teff'])
-            Teff_min = min(self.BTSettl[age]['Teff'])
-            Teff_max_array_BTSettl.append(Teff_max)
-            Teff_min_array_BTSettl.append(Teff_min)
-            
-            if age <= 0.6:
-                Teff_series = np.array(self.BTSettl[age]['Teff'])
-                A_Li_series = np.array(self.BTSettl[age]['A(Li)'])
-
-                Teff_min = min(Teff_series)
-
-                Teff_max = None
-                for i in range(len(Teff_series)):
-                    if A_Li_series[i] == -np.inf:
-                        Teff_max = Teff_series[i-1]
-                        break
-
-                if Teff_max is not None:
-                    age_array_BTSettl_Li.append(age)
-                    Teff_max_array_BTSettl_Li.append(Teff_max)
-                    Teff_min_array_BTSettl_Li.append(Teff_min)
-        
-        self.MS_color['G-J'] = self.MS_color['G-V'] + self.MS_color['Mv'] - self.MS_color['M_J']
-        self.MS_color['Teff'] = 10**self.MS_color['logT']
-        self.MS_color = self.MS_color.reset_index()
-
-        MS_color_filtered = self.MS_color[(self.MS_color['Teff'] >= 1750) & (self.MS_color['Teff'] <= 3000)].copy()
-        MS_color_filtered.loc[:, 'logR'] = np.log10(MS_color_filtered['R_Rsun'])
-
-        n = MS_color_filtered.shape[0]
         SPOTS_expanded = {}
-        age_index = 0
-
-        for Teff_BTSettl_max_Li, Teff_SPOTS_min in zip(Teff_max_array_BTSettl_Li, Teff_min_array_SPOTS):
-            age_BTSettl = list(self.BTSettl.keys())[age_index]
-            age_SPOTS = list(self.SPOTS.keys())[age_index]
-
-            if Teff_BTSettl_max_Li <= Teff_SPOTS_min:
-                age_index += 1
-
-                BTSettl_Li_isochrones_Teff = self.BTSettl[age_BTSettl][self.BTSettl[age_BTSettl]['Teff'] < Teff_SPOTS_min]
-                BTSettl_Li_isochrones_Teff = BTSettl_Li_isochrones_Teff[BTSettl_Li_isochrones_Teff['Teff'] > min(BTSettl_Li_isochrones_Teff['Teff'])]
-                BTSettl_Li_isochrones_Teff = BTSettl_Li_isochrones_Teff.sort_values(by='Teff', ascending=False)
-                BTSettl_Li_isochrones_Teff['log(Teff)'] = np.log10(BTSettl_Li_isochrones_Teff['Teff'])
-                BTSettl_Li_isochrones_Teff = BTSettl_Li_isochrones_Teff.reset_index()
-
-                MS_color_rows = {}
-                MS_color_rows[age_SPOTS] = pd.DataFrame(np.nan, index=range(n), columns=self.SPOTS[age_SPOTS].columns)
-
-                self.SPOTS[age_SPOTS]['log(Teff)'] = np.log10(self.SPOTS[age_SPOTS]['Teff'])
-                self.SPOTS[age_SPOTS]['M_bol'] = - 10 * np.log10(self.SPOTS[age_SPOTS]['Teff']/Teff_sun) - 5 * self.SPOTS[age_SPOTS]['log(R/Rsun)'] + M_bol_sun
-                self.SPOTS[age_SPOTS] = self.SPOTS[age_SPOTS].sort_values(by='log(Teff)', ascending=False)
-
-                SPOTS_expanded[age_SPOTS] = pd.concat([self.SPOTS[age_SPOTS], MS_color_rows[age_SPOTS]], ignore_index=True)
-
-                columns_map = {
-                    'Mass': 'Msun',
-                    'Teff': 'Teff',
-                    'log(Teff)': 'logT',
-                    'log(L/Lsun)': 'logL',
-                    'log(R/Rsun)': 'logR',
-                    'G-RP': 'G-Rp',
-                    'G-V': 'G-V',
-                    'G-J': 'G-J',
-                    'V_mag': 'Mv'
-                }
-
-                SPOTS_expanded[age_SPOTS]['BCv'] = np.nan
-                start_index = len(self.SPOTS[age_SPOTS])
-
-                for bc_col, spots_col in columns_map.items():
-                    SPOTS_expanded[age_SPOTS].loc[start_index:, bc_col] = MS_color_filtered[spots_col].values
-
-                SPOTS_expanded[age_SPOTS]['Lsun'] = 10**SPOTS_expanded[age_SPOTS]['log(L/Lsun)']
-                SPOTS_expanded[age_SPOTS].loc[start_index:, 'BCv'] = MS_color_filtered['BCv'].values
-
-                for i in range(n, len(SPOTS_expanded[age_SPOTS]['logAge'])):
-                    if self.f == '00':
-                        SPOTS_expanded[age_SPOTS].loc[i, 'logAge'] = 8.1
-                        SPOTS_expanded[age_SPOTS].loc[i, 'Fspot'] = 0.0
-                        SPOTS_expanded[age_SPOTS].loc[i, 'Xspot'] = 0.8
-                        SPOTS_expanded[age_SPOTS].loc[i, 'log(T_hot)'] = SPOTS_expanded[age_SPOTS]['log(Teff)'][i]
-                        SPOTS_expanded[age_SPOTS].loc[i, 'log(T_cool)'] = 0.0
-                        SPOTS_expanded[age_SPOTS].loc[i, 'M_bol'] = M_bol_sun - 2.5 * SPOTS_expanded[age_SPOTS].loc[i, 'log(R/Rsun)']
-                    else:
-                        pass
-
-                min_Teff_max = self.SPOTS[age_SPOTS]['Teff'].min()
-                min_Teff_min = 1600
-
-                for i, row in BTSettl_Li_isochrones_Teff.iterrows():
-                    if i == 0:
+        
+        BTSettl_Li_isochrones_Teff_dic = {}
+        
+        for f in self.SPOTS.keys():
+            Teff_max_array_SPOTS = []
+            Teff_min_array_SPOTS = []
+            age_array_SPOTS = []
+    
+            Teff_max_array_SPOTS_Li = []
+            Teff_min_array_SPOTS_Li = []
+            age_array_SPOTS_Li = []
+    
+            inf_index_SPOTS_array = []
+    
+            j = 0
+    
+            for age in self.SPOTS[f].keys():
+                age_array_SPOTS.append(age)
+                Teff_max = max(self.SPOTS[f][age]['Teff'])
+                Teff_min = min(self.SPOTS[f][age]['Teff'])
+                Teff_max_array_SPOTS.append(Teff_max)
+                Teff_min_array_SPOTS.append(Teff_min)
+    
+                j += 1
+    
+                if age <= 0.7:
+                    Teff_series = np.array(self.SPOTS[f][age]['Teff'])
+                    A_Li_series = np.array(self.SPOTS[f][age]['A(Li)'])
+    
+                    Teff_min_all = min(Teff_series)
+    
+                    Teff_max = None
+    
+                    for i in range(len(Teff_series)):
+                        if A_Li_series[i] == -np.inf:
+                            Teff_min = Teff_series[i-1]
+                            if i == 0:
+                                Teff_min = Teff_min_all
+                            else:
+                                pass
+                            inf_index_SPOTS_array.append(j - 1)
+                            break
+    
+                    for i in range(len(Teff_series)-1, -1, -1):
+                        if A_Li_series[i] == -np.inf:
+                            Teff_max = Teff_series[i]
+                            break
+    
+                    if Teff_max is not None:
+                        age_array_SPOTS_Li.append(age)
+                        Teff_max_array_SPOTS_Li.append(Teff_max)
+                        Teff_min_array_SPOTS_Li.append(Teff_min)
+    
+            Teff_max_array_BTSettl = []
+            Teff_min_array_BTSettl = []
+            age_array_BTSettl = []
+    
+            Teff_max_array_BTSettl_Li = []
+            Teff_min_array_BTSettl_Li = []
+            age_array_BTSettl_Li = []
+    
+            for age in self.BTSettl.keys():
+                age_array_BTSettl.append(age)
+                Teff_max = max(self.BTSettl[age]['Teff'])
+                Teff_min = min(self.BTSettl[age]['Teff'])
+                Teff_max_array_BTSettl.append(Teff_max)
+                Teff_min_array_BTSettl.append(Teff_min)
+    
+                if age <= 0.7:
+                    Teff_series = np.array(self.BTSettl[age]['Teff'])
+                    A_Li_series = np.array(self.BTSettl[age]['A(Li)'])
+    
+                    Teff_min = None
+    
+                    Teff_max = None
+    
+                    for i in range(len(Teff_series)):
+                        if A_Li_series[i] == -np.inf:
+                            Teff_min = Teff_series[i-1]
+                            break
+    
+                    for i in range(len(Teff_series)-1, -1, -1):
+                        if A_Li_series[i] == -np.inf:
+                            Teff_max = Teff_series[i+1]
+                            break
+    
+                    if Teff_max is not None:
+                        age_array_BTSettl_Li.append(age)
+                        Teff_max_array_BTSettl_Li.append(Teff_max)
+                        Teff_min_array_BTSettl_Li.append(Teff_min)
+            
+            MS_color = pd.read_csv(self.MS_color_file)
+    
+            for c in MS_color.columns:
+                if c != '#SpT':
+                    MS_color[c] = pd.to_numeric(MS_color[c], errors='coerce')
+    
+            MS_color = MS_color[10**MS_color['logT'] < 6000]
+    
+            MS_color = MS_color[10**MS_color['logT'] > 1600]
+            
+            MS_color['G-J'] = MS_color['G-V'] + MS_color['Mv'] - MS_color['M_J']
+            MS_color['G-Ks'] = MS_color['G-V'] + MS_color['Mv'] - MS_color['M_Ks']
+            MS_color['Teff'] = 10**MS_color['logT']
+            MS_color = MS_color.reset_index()
+    
+            MS_color_filtered = MS_color[(MS_color['Teff'] >= 1750) & (MS_color['Teff'] <= 3000)].copy()
+            MS_color_filtered.loc[:, 'logR'] = np.log10(MS_color_filtered['R_Rsun'])
+    
+            n = MS_color_filtered.shape[0]
+    
+    
+            SPOTS_expanded[f] = {}
+    
+            age_index = 0
+    
+            BTSettl_Li_isochrones_Teff_dic[f] = {}
+    
+            count = 0
+    
+            for Teff_SPOTS_min in Teff_min_array_SPOTS:
+                if inf_index_SPOTS_array[0] >= age_index:
+                    age_BTSettl = list(self.BTSettl.keys())[age_index]
+                    age_SPOTS = list(self.SPOTS[f].keys())[age_index]
+    
+                    age_index += 1
+    
+                    count += 1
+    
+                    BTSettl_Li_isochrones_Teff = self.BTSettl[age_BTSettl][self.BTSettl[age_BTSettl]['Teff'] < Teff_SPOTS_min]
+                    BTSettl_Li_isochrones_Teff = BTSettl_Li_isochrones_Teff[BTSettl_Li_isochrones_Teff['Teff'] > min(BTSettl_Li_isochrones_Teff['Teff'])]
+                    BTSettl_Li_isochrones_Teff = BTSettl_Li_isochrones_Teff.sort_values(by='Teff', ascending=False)
+                    BTSettl_Li_isochrones_Teff['log(Teff)'] = np.log10(BTSettl_Li_isochrones_Teff['Teff'])
+                    BTSettl_Li_isochrones_Teff_dic[f][age_BTSettl] = BTSettl_Li_isochrones_Teff.reset_index()
+    
+                    self.SPOTS[f][age_SPOTS]['log(Teff)'] = np.log10(self.SPOTS[f][age_SPOTS]['Teff'])
+                    self.SPOTS[f][age_SPOTS]['M_bol'] = - 10 * np.log10(self.SPOTS[f][age_SPOTS]['Teff']/Teff_sun) - 5 * self.SPOTS[f][age_SPOTS]['log(R/Rsun)'] + M_bol_sun
+                    self.SPOTS[f][age_SPOTS] = self.SPOTS[f][age_SPOTS].sort_values(by='log(Teff)', ascending=False)
+    
+                    SPOTS_expanded[f][age_SPOTS] = self.SPOTS[f][age_SPOTS]
+    
+                    SPOTS_expanded[f][age_SPOTS]['Lsun'] = 10**SPOTS_expanded[f][age_SPOTS]['log(L/Lsun)']
+    
+                    SPOTS_expanded[f][age_SPOTS]['M_bol'] = M_bol_sun - 2.5 * SPOTS_expanded[f][age_SPOTS]['log(R/Rsun)']
+                    SPOTS_expanded[f][age_SPOTS]['G_abs'] = SPOTS_expanded[f][age_SPOTS]['G-V'] + SPOTS_expanded[f][age_SPOTS]['V_mag']
+                    SPOTS_expanded[f][age_SPOTS]['J_abs'] = - SPOTS_expanded[f][age_SPOTS]['G-J'] + SPOTS_expanded[f][age_SPOTS]['G_abs']
+                    SPOTS_expanded[f][age_SPOTS]['RP_abs'] = - SPOTS_expanded[f][age_SPOTS]['G-RP'] + SPOTS_expanded[f][age_SPOTS]['G_abs']
+                    SPOTS_expanded[f][age_SPOTS]['BP_abs'] = SPOTS_expanded[f][age_SPOTS]['BP-RP'] + SPOTS_expanded[f][age_SPOTS]['RP_abs']
+                    SPOTS_expanded[f][age_SPOTS]['H_abs'] = - SPOTS_expanded[f][age_SPOTS]['J-H'] + SPOTS_expanded[f][age_SPOTS]['J_abs']
+                    SPOTS_expanded[f][age_SPOTS]['K_abs'] = - SPOTS_expanded[f][age_SPOTS]['G-K'] + SPOTS_expanded[f][age_SPOTS]['G_abs']
+    
+                    SPOTS_expanded[f][age_SPOTS]['RP-J'] = SPOTS_expanded[f][age_SPOTS]['RP_abs'] - SPOTS_expanded[f][age_SPOTS]['J_abs'] 
+                    SPOTS_expanded[f][age_SPOTS]['G-H'] = SPOTS_expanded[f][age_SPOTS]['G_abs'] - SPOTS_expanded[f][age_SPOTS]['H_abs'] 
+    
+                    SPOTS_expanded[f][age_SPOTS] = SPOTS_expanded[f][age_SPOTS][~pd.isna(SPOTS_expanded[f][age_SPOTS]['A(Li)'])]
+    
+            for Teff_BTSettl_min_Li, Teff_SPOTS_min in zip(Teff_min_array_BTSettl_Li, Teff_min_array_SPOTS):
+                age_BTSettl = list(self.BTSettl.keys())[age_index]
+                age_SPOTS = list(self.SPOTS[f].keys())[age_index]
+    
+    
+                if Teff_BTSettl_min_Li <= Teff_SPOTS_min:
+    
+                    age_index += 1
+    
+                    count = count + 1
+    
+                    BTSettl_Li_isochrones_Teff = self.BTSettl[age_BTSettl][self.BTSettl[age_BTSettl]['Teff'] < Teff_SPOTS_min]
+                    BTSettl_Li_isochrones_Teff = BTSettl_Li_isochrones_Teff[BTSettl_Li_isochrones_Teff['Teff'] > min(BTSettl_Li_isochrones_Teff['Teff'])]
+                    BTSettl_Li_isochrones_Teff = BTSettl_Li_isochrones_Teff.sort_values(by='Teff', ascending=False)
+                    BTSettl_Li_isochrones_Teff['log(Teff)'] = np.log10(BTSettl_Li_isochrones_Teff['Teff'])
+                    BTSettl_Li_isochrones_Teff = BTSettl_Li_isochrones_Teff.reset_index()
+                    BTSettl_Li_isochrones_Teff_dic[f][age_BTSettl] = BTSettl_Li_isochrones_Teff
+    
+                    MS_color_rows = {}
+                    MS_color_rows[age_SPOTS] = pd.DataFrame(np.nan, index=range(n), columns=self.SPOTS[f][age_SPOTS].columns)
+    
+                    self.SPOTS[f][age_SPOTS]['G-V'] = self.SPOTS[f][age_SPOTS]['G_abs'] - self.SPOTS[f][age_SPOTS]['V_mag']
+                    self.SPOTS[f][age_SPOTS]['log(Teff)'] = np.log10(self.SPOTS[f][age_SPOTS]['Teff'])
+                    self.SPOTS[f][age_SPOTS]['M_bol'] = - 10 * np.log10(self.SPOTS[f][age_SPOTS]['Teff']/Teff_sun) - 5 * self.SPOTS[f][age_SPOTS]['log(R/Rsun)'] + M_bol_sun
+                    self.SPOTS[f][age_SPOTS] = self.SPOTS[f][age_SPOTS].sort_values(by='log(Teff)', ascending=False)
+    
+                    SPOTS_expanded[f][age_SPOTS] = pd.concat([self.SPOTS[f][age_SPOTS], MS_color_rows[age_SPOTS]], ignore_index=True)
+    
+                    columns_map = {
+                        'Mass': 'Msun',
+                        'Teff': 'Teff',
+                        'log(Teff)': 'logT',
+                        'log(L/Lsun)': 'logL',
+                        'log(R/Rsun)': 'logR',
+                        'G-RP': 'G-Rp',
+                        'G-V': 'G-V',
+                        'G-J': 'G-J',
+                        'BP-RP': 'Bp-Rp',
+                        'J-H': 'J-H',
+                        'H-K': 'H-Ks',
+                        'G-K': 'G-Ks',
+                        'V_mag': 'Mv'
+                    }
+    
+                    SPOTS_expanded[f][age_SPOTS]['BCv'] = np.nan
+                    start_index = len(self.SPOTS[f][age_SPOTS])
+    
+                    for bc_col, spots_col in columns_map.items():
+                        SPOTS_expanded[f][age_SPOTS].loc[start_index:, bc_col] = MS_color_filtered[spots_col].values
+    
+                    SPOTS_expanded[f][age_SPOTS]['Lsun'] = 10**SPOTS_expanded[f][age_SPOTS]['log(L/Lsun)']
+                    SPOTS_expanded[f][age_SPOTS].loc[start_index:, 'BCv'] = MS_color_filtered['BCv'].values
+    
+                    for i in range(self.SPOTS[f][age_SPOTS]['logAge'].index[0]+1, len(SPOTS_expanded[f][age_SPOTS]['logAge'])):
+    
+                        SPOTS_expanded[f][age_SPOTS].loc[i, 'logAge'] = np.log10(age_SPOTS*1e9)
+                        SPOTS_expanded[f][age_SPOTS].loc[i, 'Fspot'] = float(f)/100
+                        SPOTS_expanded[f][age_SPOTS].loc[i, 'Age_Gyr'] = SPOTS_expanded[f][age_SPOTS]['Age_Gyr'][0]
+                        SPOTS_expanded[f][age_SPOTS].loc[i, 'Xspot'] = 0.8
+                        SPOTS_expanded[f][age_SPOTS].loc[i, 'log(T_hot)'] = SPOTS_expanded[f][age_SPOTS]['log(Teff)'][i]
+                        SPOTS_expanded[f][age_SPOTS].loc[i, 'log(T_cool)'] = 0.8*SPOTS_expanded[f][age_SPOTS]['log(Teff)'][i]
+                        SPOTS_expanded[f][age_SPOTS].loc[i, 'M_bol'] = M_bol_sun - 2.5 * SPOTS_expanded[f][age_SPOTS].loc[i, 'log(R/Rsun)']
+                        SPOTS_expanded[f][age_SPOTS].loc[i, 'G_abs'] = SPOTS_expanded[f][age_SPOTS].loc[i, 'G-V'] + SPOTS_expanded[f][age_SPOTS].loc[i, 'V_mag']
+                        SPOTS_expanded[f][age_SPOTS].loc[i, 'J_abs'] = - SPOTS_expanded[f][age_SPOTS].loc[i, 'G-J'] + SPOTS_expanded[f][age_SPOTS].loc[i, 'G_abs']
+                        SPOTS_expanded[f][age_SPOTS].loc[i, 'RP_abs'] = - SPOTS_expanded[f][age_SPOTS].loc[i, 'G-RP'] + SPOTS_expanded[f][age_SPOTS].loc[i, 'G_abs']
+                        SPOTS_expanded[f][age_SPOTS].loc[i, 'BP_abs'] = SPOTS_expanded[f][age_SPOTS].loc[i, 'BP-RP'] + SPOTS_expanded[f][age_SPOTS].loc[i, 'RP_abs']
+                        SPOTS_expanded[f][age_SPOTS].loc[i, 'H_abs'] = - SPOTS_expanded[f][age_SPOTS].loc[i, 'J-H'] + SPOTS_expanded[f][age_SPOTS].loc[i, 'J_abs']
+                        SPOTS_expanded[f][age_SPOTS].loc[i, 'K_abs'] = - SPOTS_expanded[f][age_SPOTS].loc[i, 'G-K'] + SPOTS_expanded[f][age_SPOTS].loc[i, 'G_abs']
+    
+    
+                    for i, row in BTSettl_Li_isochrones_Teff.iterrows():
                         teff_value = row['Teff']
-                        a_li_value = BTSettl_Li_isochrones_Teff[BTSettl_Li_isochrones_Teff['A(Li)'] != -np.inf]['A(Li)'].min()
-                    else:
+                        if i == 1 and BTSettl_Li_isochrones_Teff.at[0, 'A(Li)'] == -np.inf and row['A(Li)'] == -np.inf:
+                            a_li_value = BTSettl_Li_isochrones_Teff.at[i + 1, 'A(Li)'] if i + 1 < len(BTSettl_Li_isochrones_Teff) else 0
+                        else:
+                            a_li_value = row['A(Li)']
+                        nearest_index = self.find_nearest_index(SPOTS_expanded[f][age_SPOTS]['Teff'], teff_value)
+                
+                        
+                        SPOTS_expanded[f][age_SPOTS].at[nearest_index, 'A(Li)'] = a_li_value
+    
+                    SPOTS_expanded[f][age_SPOTS]['RP-J'] = SPOTS_expanded[f][age_SPOTS]['RP_abs'] - SPOTS_expanded[f][age_SPOTS]['J_abs'] 
+                    SPOTS_expanded[f][age_SPOTS]['G-H'] = SPOTS_expanded[f][age_SPOTS]['G_abs'] - SPOTS_expanded[f][age_SPOTS]['H_abs'] 
+                    SPOTS_expanded[f][age_SPOTS] = SPOTS_expanded[f][age_SPOTS][~pd.isna(SPOTS_expanded[f][age_SPOTS]['A(Li)'])]
+    
+                else:
+                    count = count + 1
+    
+                    age_index += 1
+    
+                    BTSettl_Li_isochrones_Teff = self.BTSettl[age_BTSettl][self.BTSettl[age_BTSettl]['Teff'] < Teff_SPOTS_min]
+                    BTSettl_Li_isochrones_Teff = BTSettl_Li_isochrones_Teff[BTSettl_Li_isochrones_Teff['Teff'] > min(BTSettl_Li_isochrones_Teff['Teff'])]
+                    BTSettl_Li_isochrones_Teff = BTSettl_Li_isochrones_Teff.sort_values(by='Teff', ascending=False)
+                    BTSettl_Li_isochrones_Teff['log(Teff)'] = np.log10(BTSettl_Li_isochrones_Teff['Teff'])
+                    BTSettl_Li_isochrones_Teff_dic[f][age_BTSettl] = BTSettl_Li_isochrones_Teff.reset_index()
+    
+                    MS_color_rows = {}
+                    MS_color_rows[age_SPOTS] = pd.DataFrame(np.nan, index=range(n), columns=self.SPOTS[f][age_SPOTS].columns)
+    
+                    self.SPOTS[f][age_SPOTS]['G-V'] = self.SPOTS[f][age_SPOTS]['G_abs'] - self.SPOTS[f][age_SPOTS]['V_mag']
+                    self.SPOTS[f][age_SPOTS]['log(Teff)'] = np.log10(self.SPOTS[f][age_SPOTS]['Teff'])
+                    self.SPOTS[f][age_SPOTS]['M_bol'] = - 10 * np.log10(self.SPOTS[f][age_SPOTS]['Teff']/Teff_sun) - 5 * self.SPOTS[f][age_SPOTS]['log(R/Rsun)'] + M_bol_sun
+                    self.SPOTS[f][age_SPOTS] = self.SPOTS[f][age_SPOTS].sort_values(by='log(Teff)', ascending=False)
+    
+                    SPOTS_expanded[f][age_SPOTS] = pd.concat([self.SPOTS[f][age_SPOTS], MS_color_rows[age_SPOTS]], ignore_index=True)
+    
+                    columns_map = {
+                        'Mass': 'Msun',
+                        'Teff': 'Teff',
+                        'log(Teff)': 'logT',
+                        'log(L/Lsun)': 'logL',
+                        'log(R/Rsun)': 'logR',
+                        'G-RP': 'G-Rp',
+                        'G-V': 'G-V',
+                        'G-J': 'G-J',
+                        'BP-RP': 'Bp-Rp',
+                        'J-H': 'J-H',
+                        'H-K': 'H-Ks',
+                        'G-K': 'G-Ks',
+                        'V_mag': 'Mv'
+                    }
+    
+                    SPOTS_expanded[f][age_SPOTS]['BCv'] = np.nan
+                    start_index = len(self.SPOTS[f][age_SPOTS])
+    
+                    for bc_col, spots_col in columns_map.items():
+                        SPOTS_expanded[f][age_SPOTS].loc[start_index:, bc_col] = MS_color_filtered[spots_col].values
+    
+                    SPOTS_expanded[f][age_SPOTS]['Lsun'] = 10**SPOTS_expanded[f][age_SPOTS]['log(L/Lsun)']
+                    SPOTS_expanded[f][age_SPOTS].loc[start_index:, 'BCv'] = MS_color_filtered['BCv'].values
+    
+                    for i in range(self.SPOTS[f][age_SPOTS]['logAge'].index[0]+1, len(SPOTS_expanded[f][age_SPOTS]['logAge'])):
+    
+                        SPOTS_expanded[f][age_SPOTS].loc[i, 'logAge'] = np.log10(age_SPOTS*1e9)
+                        SPOTS_expanded[f][age_SPOTS].loc[i, 'Fspot'] = float(f)/100
+                        SPOTS_expanded[f][age_SPOTS].loc[i, 'Age_Gyr'] = SPOTS_expanded[f][age_SPOTS]['Age_Gyr'][0]
+                        SPOTS_expanded[f][age_SPOTS].loc[i, 'Xspot'] = 0.8
+                        SPOTS_expanded[f][age_SPOTS].loc[i, 'log(T_hot)'] = SPOTS_expanded[f][age_SPOTS]['log(Teff)'][i]
+                        SPOTS_expanded[f][age_SPOTS].loc[i, 'log(T_cool)'] = 0.8*SPOTS_expanded[f][age_SPOTS]['log(Teff)'][i]
+                        SPOTS_expanded[f][age_SPOTS].loc[i, 'M_bol'] = M_bol_sun - 2.5 * SPOTS_expanded[f][age_SPOTS].loc[i, 'log(R/Rsun)']
+                        SPOTS_expanded[f][age_SPOTS].loc[i, 'G_abs'] = SPOTS_expanded[f][age_SPOTS].loc[i, 'G-V'] + SPOTS_expanded[f][age_SPOTS].loc[i, 'V_mag']
+                        SPOTS_expanded[f][age_SPOTS].loc[i, 'J_abs'] = - SPOTS_expanded[f][age_SPOTS].loc[i, 'G-J'] + SPOTS_expanded[f][age_SPOTS].loc[i, 'G_abs']
+                        SPOTS_expanded[f][age_SPOTS].loc[i, 'RP_abs'] = - SPOTS_expanded[f][age_SPOTS].loc[i, 'G-RP'] + SPOTS_expanded[f][age_SPOTS].loc[i, 'G_abs']
+                        SPOTS_expanded[f][age_SPOTS].loc[i, 'BP_abs'] = SPOTS_expanded[f][age_SPOTS].loc[i, 'BP-RP'] + SPOTS_expanded[f][age_SPOTS].loc[i, 'RP_abs']
+                        SPOTS_expanded[f][age_SPOTS].loc[i, 'H_abs'] = - SPOTS_expanded[f][age_SPOTS].loc[i, 'J-H'] + SPOTS_expanded[f][age_SPOTS].loc[i, 'J_abs']
+                        SPOTS_expanded[f][age_SPOTS].loc[i, 'K_abs'] = - SPOTS_expanded[f][age_SPOTS].loc[i, 'G-K'] + SPOTS_expanded[f][age_SPOTS].loc[i, 'G_abs']
+    
+                    for i, row in BTSettl_Li_isochrones_Teff.iterrows():
                         teff_value = row['Teff']
-                        a_li_value = row['A(Li)']
-                    #teff_value = row['Teff']
-                    #a_li_value = row['A(Li)']
-
-                    nearest_index = self.find_nearest_index(SPOTS_expanded[age_SPOTS]['Teff'], teff_value)
-                    SPOTS_expanded[age_SPOTS].at[nearest_index, 'A(Li)'] = a_li_value
-
-                SPOTS_expanded[age_SPOTS]['G'] = SPOTS_expanded[age_SPOTS]['G-V'] + SPOTS_expanded[age_SPOTS]['V_mag']
-                SPOTS_expanded[age_SPOTS]['J'] = - SPOTS_expanded[age_SPOTS]['G-J'] + SPOTS_expanded[age_SPOTS]['G']
-                SPOTS_expanded[age_SPOTS]['RP'] = - SPOTS_expanded[age_SPOTS]['G-RP'] + SPOTS_expanded[age_SPOTS]['G']
-
-                SPOTS_expanded[age_SPOTS] = SPOTS_expanded[age_SPOTS][~pd.isna(SPOTS_expanded[age_SPOTS]['A(Li)'])]
-            else:
-                SPOTS_expanded[age_SPOTS] = self.SPOTS[age_SPOTS]
-                age_index += 1
-
-        return SPOTS_expanded, min_Teff_max, min_Teff_min
+                        if i == 1 and BTSettl_Li_isochrones_Teff.at[0, 'A(Li)'] == -np.inf and row['A(Li)'] == -np.inf:
+                            a_li_value = BTSettl_Li_isochrones_Teff.at[i + 1, 'A(Li)'] if i + 1 < len(BTSettl_Li_isochrones_Teff) else 0
+                        else:
+                            a_li_value = row['A(Li)']
+                        nearest_index = self.find_nearest_index(SPOTS_expanded[f][age_SPOTS]['Teff'], teff_value)
+                        
+                        SPOTS_expanded[f][age_SPOTS].at[nearest_index, 'A(Li)'] = a_li_value
+                    
+                    SPOTS_expanded[f][age_SPOTS]['RP-J'] = SPOTS_expanded[f][age_SPOTS]['RP_abs'] - SPOTS_expanded[f][age_SPOTS]['J_abs'] 
+                    SPOTS_expanded[f][age_SPOTS]['G-H'] = SPOTS_expanded[f][age_SPOTS]['G_abs'] - SPOTS_expanded[f][age_SPOTS]['H_abs'] 
+    
+                    SPOTS_expanded[f][age_SPOTS] = SPOTS_expanded[f][age_SPOTS][~pd.isna(SPOTS_expanded[f][age_SPOTS]['A(Li)'])]
+    
+                SPOTS_expanded[f][age_SPOTS]['log(g)'] = self.calculate_log_g(SPOTS_expanded[f][age_SPOTS]['Mass'], 10**SPOTS_expanded[f][age_SPOTS]['log(R/Rsun)'])
+        
+        for f in SPOTS_expanded:
+            if f != '00':
+                for age_SPOTS in SPOTS_expanded[f]:
+                    a_li = SPOTS_expanded[f][age_SPOTS]['A(Li)']
+                    found_inf = False
+                    for i in range(len(a_li) - 1):
+                        if a_li.iloc[i] == -np.inf:
+                            found_inf = True
+                        if found_inf and a_li.iloc[i] != -np.inf and a_li.iloc[i] > a_li.iloc[i + 1]:
+                            a_li.iloc[i] = -np.inf
+        
+        return SPOTS_expanded, BTSettl_Li_isochrones_Teff_dic
+    
+    def plot_CMD_ALi(self, SPOTS_expanded, BTSettl_Li_isochrones_Teff_dic, BTSettl_Li_isochrones, data_obs):
+        cmap_BTSettl_original = plt.get_cmap('Reds')
+        cmap_BTSettl_inverted = self.invert_cmap(cmap_BTSettl_original)
+        
+        cmap_SPOTS_original = plt.get_cmap('Blues')
+        cmap_SPOTS_inverted = self.invert_cmap(cmap_SPOTS_original)
+        
+        norm_BTSettl = plt.Normalize(vmin=np.log10(0.004*1e9), vmax=np.log10(0.6*1e9))
+        cmap_BTSettl = cm.ScalarMappable(norm=norm_BTSettl, cmap=cmap_BTSettl_inverted)
+        
+        norm_SPOTS = plt.Normalize(vmin=np.log10(0.004*1e9), vmax=np.log10(0.6*1e9))
+        cmap_SPOTS = cm.ScalarMappable(norm=norm_SPOTS, cmap=cmap_SPOTS_inverted)
+        
+        for f in self.f_values:
+        
+            plt.rcParams.update({'font.size': 14, 'axes.linewidth': 1, 'axes.edgecolor': 'k'})
+            plt.rcParams['font.family'] = 'serif'
+        
+            fig, axs = plt.subplots(2, 3, figsize=(20, 10), constrained_layout=True)
+        
+            bands1 = ['RP_abs', 'G_abs', 'G_abs', 'G_abs', 'G_abs', 'J_abs', 'H_abs', 'J_abs', 'H_abs']
+            bands2 = ['J_abs', 'J_abs', 'H_abs', 'K_abs', 'RP_abs', 'H_abs', 'K_abs', 'H_abs', 'K_abs']
+            colors = ['RP-J', 'G-J', 'G-H', 'G-K', 'G-RP', 'J-H', 'H-K', 'J-H', 'H-K']
+        
+            for i, ax in enumerate(axs.flat):
+                band1 = bands1[i]
+                band2 = bands2[i]
+                color = colors[i]
+                ax.scatter(data_obs[band1]-data_obs[band2], data_obs['ALi'], s=10, zorder=6, color='orange', alpha=0.5)
+                ax.set_ylabel('$A(Li) [dex]$')
+                ax.set_xlabel(f'{color} [mag]')
+        
+                max_array = []
+        
+                for age_BTSettl in BTSettl_Li_isochrones_Teff_dic[f].keys():
+                    if age_BTSettl < 0.6:
+                        log_age_BTSettl = np.log10(age_BTSettl * 1e9)
+                        color_BTSettl = cmap_BTSettl.to_rgba(log_age_BTSettl)
+                        plot_label = 'Low mass BT-Settl' if i == 0 and age_BTSettl == 0.004 else ""
+                        ax.plot(BTSettl_Li_isochrones_Teff_dic[f][age_BTSettl][band1] - BTSettl_Li_isochrones_Teff_dic[f][age_BTSettl][band2], BTSettl_Li_isochrones_Teff_dic[f][age_BTSettl]['A(Li)'], c=color_BTSettl, lw=1, alpha=1, label=plot_label)
+                        max_array.append(max(BTSettl_Li_isochrones_Teff_dic[f][age_BTSettl][band1] - BTSettl_Li_isochrones_Teff_dic[f][age_BTSettl][band2]))
+                        
+                for age_SPOTS in SPOTS_expanded[f].keys():
+                    if age_SPOTS < 0.6:
+                        log_age_SPOTS = np.log10(age_SPOTS * 1e9)
+                        color_SPOTS = cmap_SPOTS.to_rgba(log_age_SPOTS)
+                        plot_label = f'SPOTS extended $f=0.${f}' if i == 0 and age_SPOTS == 0.004 else ""
+                        ax.plot(SPOTS_expanded[f][age_SPOTS][color], SPOTS_expanded[f][age_SPOTS]['A(Li)'], lw=1, color=color_SPOTS, zorder=1, alpha=1, label=plot_label)
+        
+                ax.plot(BTSettl_Li_isochrones[0.120][band1] - BTSettl_Li_isochrones[0.120][band2], BTSettl_Li_isochrones[0.120]['A(Li)'], lw=1, c='k', ls='--',  alpha=1, label='Low mass BT-Settl 120 Myr' if i == 0 else "")
+                ax.plot(SPOTS_expanded[f][0.126][color], SPOTS_expanded[f][0.126]['A(Li)'], lw=1, color='k', ls='-', zorder=2, alpha=1, label='SPOTS extended 120 Myr' if i == 0 else "")
+        
+                ax.set_xlim(0, max(max_array))
+        
+            fig.colorbar(cmap_BTSettl, ax=axs[:, 2], orientation='vertical', label=r'$\log({\rm Age\ [yr]})$')
+            cbar = fig.colorbar(cmap_SPOTS, ax=axs[:, 2], orientation='vertical', label=r'$\log({\rm Age\ [yr]})$')
+        
+            cbar.ax.set_yticklabels([])
+            cbar.ax.set_ylabel("")
+        
+            fig.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15))
+        
+            plt.show()
+        
+            plt.rcParams.update({'font.size': 11, 'axes.linewidth': 1, 'axes.edgecolor': 'k'})
+            plt.rcParams['font.family'] = 'serif'
+        
+            plt.rcParams.update({'font.size': 14, 'axes.linewidth': 1, 'axes.edgecolor': 'k'})
+            plt.rcParams['font.family'] = 'serif'
+        
+            fig, axs = plt.subplots(2, 3, figsize=(20, 10), constrained_layout=True)
+        
+            bands1 = ['RP_abs', 'G_abs', 'G_abs', 'G_abs', 'G_abs', 'J_abs', 'H_abs', 'J_abs', 'H_abs']
+            bands2 = ['J_abs', 'J_abs', 'H_abs', 'K_abs', 'RP_abs', 'H_abs', 'K_abs', 'H_abs', 'K_abs']
+            bandsobs = ['RP_abs', 'G_abs', 'G_abs', 'G_abs', 'G_abs', 'J_abs', 'H_abs']
+            colors = ['RP-J', 'G-J', 'G-H', 'G-K', 'G-RP', 'J-H', 'H-K', 'J-H', 'H-K']
+        
+        
+            for i, ax in enumerate(axs.flat):
+                band1 = bands1[i]
+                band2 = bands2[i]
+                bandobs = bandsobs[i]
+                color = colors[i]
+                ax.scatter(data_obs[band1]-data_obs[band2], data_obs[bandobs], s=10, zorder=6, color='orange', alpha=0.125)
+                m = bandobs.split("_")[0]
+                ax.set_ylabel(f'{m} [mag]')
+                ax.set_xlabel(f'{color} [mag]')
+        
+                # Plot BTSettl and SPOTS isochrones
+                for age_BTSettl in BTSettl_Li_isochrones_Teff_dic[f].keys():
+                    log_age_BTSettl = np.log10(age_BTSettl * 1e9)
+                    color_BTSettl = cmap_BTSettl.to_rgba(log_age_BTSettl)
+                    plot_label = 'Low mass BT-Settl' if i == 0 and age_BTSettl == 0.004 else ""
+                    ax.plot(BTSettl_Li_isochrones_Teff_dic[f][age_BTSettl][band1] - BTSettl_Li_isochrones_Teff_dic[f][age_BTSettl][band2], BTSettl_Li_isochrones_Teff_dic[f][age_BTSettl][bandobs], c=color_BTSettl, lw=1, alpha=1, label=plot_label)
+        
+                for age_SPOTS in SPOTS_expanded[f].keys():
+                    log_age_SPOTS = np.log10(age_SPOTS * 1e9)
+                    color_SPOTS = cmap_SPOTS.to_rgba(log_age_SPOTS)
+                    plot_label = f'SPOTS extended $f=0.${f}' if i == 0 and age_SPOTS == 0.004 else ""
+                    ax.plot(SPOTS_expanded[f][age_SPOTS][color], SPOTS_expanded[f][age_SPOTS][bandobs], lw=1, color=color_SPOTS, zorder=1, alpha=1, label=plot_label)
+    
+                ax.invert_yaxis()
+    
+                ax.plot(BTSettl_Li_isochrones[0.120][band1] - BTSettl_Li_isochrones[0.120][band2], BTSettl_Li_isochrones[0.120][bandobs], lw=1, c='k', ls='--', zorder=8, alpha=1, label='Low mass BT-Settl 120 Myr' if i == 0 else "")
+                ax.plot(SPOTS_expanded[f][0.126][color], SPOTS_expanded[f][0.126][bandobs], lw=1, color='k', ls='-', zorder=7, alpha=1, label='SPOTS extended 120 Myr' if i == 0 else "")
+    
+            fig.colorbar(cmap_BTSettl, ax=axs[:, 2], orientation='vertical', label=r'$\log({\rm Age\ [yr]})$')
+            cbar = fig.colorbar(cmap_SPOTS, ax=axs[:, 2], orientation='vertical', label=r'$\log({\rm Age\ [yr]})$')
+    
+            cbar.ax.set_yticklabels([])
+            cbar.ax.set_ylabel("")
+    
+            fig.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15))
+    
+            plt.show()
+    
+            plt.rcParams.update({'font.size': 11, 'axes.linewidth': 1, 'axes.edgecolor': 'k'})
+            plt.rcParams['font.family'] = 'serif'
 
 class Isochrones:
     def __init__(self, model1_dict, model2_dict, bands1, bands2, mod1, mod2, isochrones, filename=None, dpi=350, data_obs=None, obs=False, bandsobs=None):
@@ -1454,72 +1888,79 @@ class Isochrones:
 
     def plot_isochrones_grid(self):
         plt.rcParams.update({'font.size': 14})  # Set the font size
-
+    
         fig, axs = plt.subplots(len(self.isochrones), len(self.bands1), figsize=(8*len(self.bands1), 6*len(self.isochrones)), sharex='col')  # Create the figure and subplots
-
+    
         max_mass_labels = 5  # Maximum number of mass labels to show
-        
+        handles, labels = [], []
+    
+        n = 0
+    
         # Iterate over each column (band combination)
         for i, (band1, band2) in enumerate(zip(self.bands1, self.bands2)):
             max_x_column = float('-inf')
             max_y = float('-inf')
-
+    
             # Iterate over each row (isochrone)
             for j, isochrone in enumerate(self.isochrones):
                 ax = axs[j, i]
                 isochrone_1 = min(self.model1_dict.keys(), key=lambda x: abs(x - isochrone))
                 isochrone_2 = min(self.model2_dict.keys(), key=lambda x: abs(x - isochrone))
-
+    
                 model1_df = self.model1_dict[isochrone_1]
                 model1_df = model1_df.loc[model1_df['M/Ms'] < 1.5]
                 model1_df = model1_df.loc[model1_df['M/Ms'] > 0.08]
-
+    
                 model2_df = self.model2_dict[isochrone_2]
                 model2_df = model2_df.loc[model2_df['M/Ms'] < 1.5]
                 model2_df = model2_df.loc[model2_df['M/Ms'] > 0.08]
-
+    
                 min_mm_model1 = min(model1_df['M/Ms'])
                 min_mm_model2 = min(model2_df['M/Ms'])
-
+    
                 mm_values = np.linspace(1.5, min(min_mm_model1, min_mm_model2), max_mass_labels)
-
+    
                 x1 = self.model1_dict[isochrone_1][band1[0]] - self.model1_dict[isochrone_1][band1[1]]
                 y1 = self.model1_dict[isochrone_1][band1[0]]
                 x2 = self.model2_dict[isochrone_2][band2[0]] - self.model2_dict[isochrone_2][band2[1]]
                 y2 = self.model2_dict[isochrone_2][band2[0]]
-
-                ax.plot(x1, y1, label=f'{self.get_first_word(self.mod1)}', zorder=2, linewidth=2, color='blue')
-                ax.plot(x2, y2, label=f'{self.get_first_word(self.mod2)}', zorder=1, linewidth=2, color='orange')
-
+    
+                line1, = ax.plot(x1, y1, label=f'{self.get_first_word(self.mod1)}', zorder=2, linewidth=2, color='blue')
+                line2, = ax.plot(x2, y2, label=f'{self.get_first_word(self.mod2)}', zorder=1, linewidth=2, color='orange')
+    
+                if i == 0 and j == 0:  # Add handles and labels only once
+                    handles.extend([line1, line2])
+                    labels.extend([line1.get_label(), line2.get_label()])
+    
                 max_x_column = max(max_x_column, np.max(x1), np.max(x2))
                 max_y = max(max_y, np.max(y1), np.max(y2))
-
+    
                 for mm_value in mm_values:
                     closest_row_model1 = model1_df.iloc[(model1_df['M/Ms'] - mm_value).abs().argsort()[:1]]
                     closest_row_model2 = model2_df.iloc[(model2_df['M/Ms'] - mm_value).abs().argsort()[:1]]
-
+    
                     x_mass_model1 = closest_row_model1[band1[0]] - closest_row_model1[band1[1]]
                     y_mass_model1 = closest_row_model1[band1[0]]
                     mass_model1 = closest_row_model1['M/Ms']
-
+    
                     x_mass_model2 = closest_row_model2[band2[0]] - closest_row_model2[band2[1]]
                     y_mass_model2 = closest_row_model2[band2[0]]
                     mass_model2 = closest_row_model2['M/Ms']
-
+    
                     for x_mass1, y_mass1, mass1, x_mass2, y_mass2, mass2 in zip(x_mass_model1, y_mass_model1, mass_model1, x_mass_model2, y_mass_model2, mass_model2):
                         text = f'{((mass1+mass2)/2):.3f}'
-
+    
                         if x_mass2 - x_mass1 < 0:
                             text_x = x_mass1 + (1/30)*(max_x_column+0.2)
                             ax.text(text_x, y_mass1, text, fontsize=12, color='k')
                         elif x_mass1 - x_mass2 < 0:
                             text_x = x_mass2 + (1/30)*(max_x_column+0.2)
                             ax.text(text_x, y_mass2, text, fontsize=12, color='k')
-
+    
                         ax.plot([x_mass1, x_mass2], [y_mass1, y_mass2], color='k', linewidth=1)
-
+    
                 intersection_points = self.find_intersection(np.column_stack((x1, y1)), np.column_stack((x2, y2)))
-
+    
                 if intersection_points:
                     first_point = intersection_points[0]
                     if -0.2 <= first_point[0] <= max_x_column and 1 <= first_point[1] <= max_y:
@@ -1528,31 +1969,38 @@ class Isochrones:
                         ax.text(0.55, 0.95, f'({first_point[0]:.2f}, {first_point[1]:.2f})', fontsize=18, horizontalalignment='center', verticalalignment='center', transform=ax.transAxes, color='black')  # Adjusted position for text
                     else:
                         pass
-
+    
                 # Plot observational data if available
                 if self.obs and self.bandsobs:
                     if isochrone == 0.08 or isochrone == 0.12:
-                        ax.errorbar(self.data_obs[f'{self.bandsobs[i][0]}'+'_abs']-self.data_obs[f'{self.bandsobs[i][1]}'+'_abs'],
+                        obs_points = ax.errorbar(self.data_obs[f'{self.bandsobs[i][0]}'+'_abs']-self.data_obs[f'{self.bandsobs[i][1]}'+'_abs'],
                                     self.data_obs[f'{self.bandsobs[i][0]}'+'_abs'], 
-                                    yerr=self.data_obs['e_'+f'{self.bandsobs[i][0]}'], fmt='.', alpha=0.125, label='Obs', zorder=0, color='r')
-
+                                    yerr=self.data_obs['e_'+f'{self.bandsobs[i][0]}'], fmt='.', alpha=0.25, label='Obs', zorder=0, color='r')
+                        if n == 0:  # Add observational points handle and label only once
+                            handles.append(obs_points)
+                            labels.append('Obs')
+                            n = n + 1
+    
                 if j == len(self.isochrones) - 1:
-                    ax.set_xlabel(f'{band1[0]}-{band1[1]} [mag]')
+                    ax.set_xlabel(f'{band1[0].split("_")[0]}-{band1[1].split("_")[0]} [mag]')
                 if i == 0:
-                    ax.set_ylabel(f'{band1[0]} [mag]')
+                    ax.set_ylabel(f'{band1[0].split("_")[0]} [mag]')
                 if j == 0:
-                    ax.set_title(f'{band1[0]}-{band1[1]}')
-
+                    ax.set_title(f'{band1[0].split("_")[0]}-{band1[1].split("_")[0]}')
+    
+                ax.text(0.95, 0.95, f'{isochrone*1000:.0f} Myr', transform=ax.transAxes, fontsize=14, verticalalignment='top', horizontalalignment='right')
                 ax.set_xlim(-0.2, max_x_column+0.2)
                 ax.set_ylim(max_y, 1)
                 ax.xaxis.set_major_locator(ticker.MaxNLocator(5))
                 ax.xaxis.set_minor_locator(ticker.MultipleLocator(0.05))
                 ax.yaxis.set_major_locator(ticker.MaxNLocator(5))
                 ax.yaxis.set_minor_locator(ticker.MultipleLocator(1))
-                ax.legend(loc='upper right', fontsize=12)
-
-        plt.subplots_adjust(wspace=0.4, hspace=0)
-
+    
+        # Create a single legend for the entire figure
+        fig.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.5, 0.075), fontsize=12, ncol=3)
+    
+        plt.subplots_adjust(wspace=0.125, hspace=0)  # Adjust top to make space for the legend
+    
         if self.filename:
             self.save_model_comparison(self.filename, self.mod1, self.mod2)
         else:
@@ -1635,8 +2083,8 @@ class Isochrones:
                             self.data_obs[f'{bandobs[2]}'+'_abs'], 
                             yerr=self.data_obs['e_'+f'{bandobs[2]}'], fmt='.', alpha=0.125, label='Obs', zorder=0, color='r')
 
-            ax.set_xlabel(f'{band1[0]}-{band1[1]} [mag]')
-            ax.set_ylabel(f'{band1[2]} [mag]')
+            ax.set_xlabel(f'{band1[0].split("_")[0]}-{band1[1].split("_")[0]} [mag]')
+            ax.set_ylabel(f'{band1[2].split("_")[0]} [mag]')
             ax.xaxis.set_major_locator(ticker.AutoLocator())
             ax.xaxis.set_major_formatter(ticker.ScalarFormatter())
             ax.text(0.825, 0.85, f'{isochrone_1} Gyr', transform=ax.transAxes, fontsize=18, verticalalignment='bottom', horizontalalignment='left')  
@@ -1652,7 +2100,7 @@ class Isochrones:
         legend_handles = [handles[labels.index(label)] for label in unique_labels]
         if self.obs:
             legend_handles.append(Line2D([0], [0], marker='o', color='w', markerfacecolor='r', markersize=10, label='Obs'))  
-        fig.legend(legend_handles, unique_labels + ['Obs'], loc='upper center', bbox_to_anchor=(0.5, 0.9), fontsize=16, ncol=3, edgecolor='black')  
+        fig.legend(legend_handles, unique_labels + ['Obs'], loc='upper center', bbox_to_anchor=(0.5, 0.075), fontsize=16, ncol=3, edgecolor='black')  
         if self.filename:
             self.save_model_comparison(self.filename, self.mod1, self.mod2)
         else:
@@ -1750,7 +2198,7 @@ class Isochrones:
         legend_handles = [handles[labels.index(label)] for label in unique_labels]
         if self.obs:
             legend_handles.append(Line2D([0], [0], marker='o', color='w', markerfacecolor='r', markersize=10, label='Obs'))  
-        fig.legend(legend_handles, unique_labels + ['Obs'], loc='upper center', bbox_to_anchor=(0.5, 0.9), fontsize=16, ncol=3, edgecolor='black')
+        fig.legend(legend_handles, unique_labels + ['Obs'], loc='upper center', bbox_to_anchor=(0.5, 0.075), fontsize=16, ncol=3, edgecolor='black')
         if self.filename:
             self.save_model_comparison(self.filename, self.mod1, self.mod2)
         else:
