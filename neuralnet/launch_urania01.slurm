@@ -2,7 +2,7 @@
 
 #------- Descripción del trabajo -------
 
-#SBATCH --job-name='edl training'
+#SBATCH --job-name='Li training'
 #SBATCH --partition=normal
 
 #------- Avisos -------
@@ -14,12 +14,12 @@
 
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --time=12:00:00
+#SBATCH --time=00:30:00
 
 #------- Entrada/Salida -------
 
-#SBATCH --output=debug_edl_%j.out
-#SBATCH --error=debug_edl_%j.err
+#SBATCH --output=debug_Li_%j.out
+#SBATCH --error=debug_Li_%j.err
 
 #------- Carga de módulos -------
 
@@ -36,4 +36,4 @@ echo "== Submit dir. : ${SLURM_SUBMIT_DIR}"
 #------- Comando -------
 #- export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 
-python training04.py
+python training05.py
