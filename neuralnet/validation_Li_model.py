@@ -1,14 +1,11 @@
-from sklearn.model_selection import train_test_split, KFold
+from sklearn.model_selection import RepeatedKFold, train_test_split, KFold
 from tensorflow import keras
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.models import Sequential
 from typing import List
 from tensorflow.keras.callbacks import CSVLogger, ModelCheckpoint
 from sklearn.metrics import average_precision_score, mean_squared_error
-
-
 from sklearn.preprocessing import StandardScaler, MinMaxScaler, PowerTransformer
-from pickle import dump
 from sklearn.metrics import PredictionErrorDisplay
 
 import numpy as np
@@ -18,39 +15,26 @@ import tensorflow as tf
 import time
 import sys
 import os
+import pickle
 
 print(f"Running Tensoflow {tf.__version__}")
 
 # Load data
 # ---------
-
-BTSettl = pd.read_csv("../data/BT-Settl_all_Myr_Gaia+2MASS+PanSTARRS.csv")
+BTSettl = pd.read_csv("../data/BT-Settl_all_Myr_Gaia_2MASS_PanSTARRS_ALi.csv")
 inputs = ["age_Myr", "M/Ms"]
-targets = ["Li"]
+targets = ["ALi"]
 
-X = np.array(BTSettl[inputs])
-Y = np.array(BTSettl[targets])
-
-X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, shuffle=True)
+inputs = np.array(BTSettl[inputs])
+targets = np.array(BTSettl[targets])
 
 # Normalize data
-BoxCox = PowerTransformer(method="box-cox", standardize=False).fit(X_train)
-X_train = BoxCox.transform(X_train)
-X_test = BoxCox.transform(X_test)
-MinMax = MinMaxScaler().fit(X_train)
-X_train = MinMax.transform(X_train)
-X_test = MinMax.transform(X_test)
+BoxCox = PowerTransformer(method="box-cox", standardize=False).fit(inputs)
+inputs = BoxCox.transform(inputs)
+MinMax = MinMaxScaler().fit(inputs)
+inputs = MinMax.transform(inputs)
 scalers = [BoxCox, MinMax]
 
-# Split outputs
-Li_train = Y_train[:, 0]
-Li_test = Y_test[:, 0]
-
-# Merge inputs and targets to do the validation
-# ---------------------------------------------
-
-inputs = np.concatenate((X_train, X_test), axis=0)
-targets = np.concatenate((Li_train, Li_test), axis=0)
 
 # Defining model archiquetures
 # ----------------------------
@@ -125,7 +109,7 @@ num_layers = 2  # Number of hidden layers
 units = [64, 64]  # Units in each hidden layer
 activations = ["relu", "relu"]  # Activation functions for each hidden layer
 output_units = 1  # Number of units in the output layer
-output_activation = "sigmoid"  # Activation function for the output layer
+output_activation = "relu"  # Activation function for the output layer
 
 model1 = create_custom_model(
     input_shape, num_layers, units, activations, output_units, output_activation
@@ -137,7 +121,7 @@ num_layers = 3  # Number of hidden layers
 units = [64, 64, 64]  # Units in each hidden layer
 activations = ["relu", "relu", "relu"]  # Activation functions for each hidden layer
 output_units = 1  # Number of units in the output layer
-output_activation = "sigmoid"  # Activation function for the output layer
+output_activation = "relu"  # Activation function for the output layer
 
 model2 = create_custom_model(
     input_shape, num_layers, units, activations, output_units, output_activation
@@ -154,7 +138,7 @@ activations = [
     "relu",
 ]  # Activation functions for each hidden layer
 output_units = 1  # Number of units in the output layer
-output_activation = "sigmoid"  # Activation function for the output layer
+output_activation = "relu"  # Activation function for the output layer
 
 model3 = create_custom_model(
     input_shape, num_layers, units, activations, output_units, output_activation
@@ -171,7 +155,7 @@ activations = [
     "relu",
 ]  # Activation functions for each hidden layer
 output_units = 1  # Number of units in the output layer
-output_activation = "sigmoid"  # Activation function for the output layer
+output_activation = "relu"  # Activation function for the output layer
 
 model4 = create_custom_model(
     input_shape, num_layers, units, activations, output_units, output_activation
@@ -184,7 +168,7 @@ models = [model1, model2, model3, model4]
 os.makedirs("best_models", exist_ok=True)
 os.makedirs("logs", exist_ok=True)
 
-kfold = KFold(n_splits=5, shuffle=True, random_state=1)
+kfold = RepeatedKFold(n_repeats=5, random_state=72)
 
 results = {}
 
@@ -210,7 +194,7 @@ for model in models:
         history = model.fit(
             X_train,
             y_train,
-            epochs=50,
+            epochs=20000,
             batch_size=32,
             verbose=0,
             validation_data=(X_val, y_val),
@@ -224,53 +208,58 @@ for model in models:
         mse = mean_squared_error(y_val, y_pred)
         fold_errors.append(mse)
 
-        fig, axs = plt.subplots(1, 1, figsize=(15, 10))
-        fig.suptitle("Training loss")
-        axs.plot(
-            range(len(history.history["loss"])),
-            history.history["loss"],
-            label="Total loss",
-        )
-        fig.savefig(f"logs/loss_{model_name}_fold_{fold}.png")
-        plt.close()
+        # fig, axs = plt.subplots(1, 1, figsize=(15, 10))
+        # fig.suptitle("Training loss")
+        # axs.plot(
+        #     range(len(history.history["loss"])),
+        #     history.history["loss"],
+        #     label="Total loss",
+        # )
+        # fig.savefig(f"logs/loss_{model_name}_fold_{fold}.png")
+        # plt.close()
 
     results[model_name] = fold_errors
 
+
+with open("validation_Li_model_results.pkl", "wb") as f:
+    pickle.dump(results, f)
+
 # Calculate average MSE for each model
-average_results = {model: np.mean(errors) for model, errors in results.items()}
-sd_results = {model: np.std(errors) for model, errors in results.items()}
-best_model_name = min(average_results, key=average_results.get)
-print(
-    f"The best model is {best_model_name} with an average MSE of {average_results[best_model_name]:.4f}"
-)
+# average_results = {model: np.mean(errors) for model, errors in results.items()}
+# sd_results = {model: np.std(errors) for model, errors in results.items()}
+# best_model_name = min(average_results, key=average_results.get)
+# print(
+#     f"The best model is {best_model_name} with an average MSE of {average_results[best_model_name]:.4f}"
+# )
+#
+# results = [average_results, sd_results]
+# df = pd.DataFrame(results, index=list(range(len(results)))).T
+# df.columns = ["Average", "StandardDeviation"]
+#
 
-results = [average_results, sd_results]
-df = pd.DataFrame(results, index=list(range(len(results)))).T
-df.columns = ["Average", "StandardDeviation"]
-
-x_values = range(len(df))
-
-# Create the error bar plot
-fig, axs = plt.subplots(ncols=1, figsize=(8, 8))
-plt.errorbar(
-    x_values,
-    df["Average"],
-    yerr=df["StandardDeviation"],
-    fmt="o",
-    capsize=5,
-    capthick=2,
-    ecolor="red",
-    label="Average with Std Dev",
-)
-
-# Adding labels and title
-plt.xlabel("Model")
-plt.ylabel("Average")
-plt.title("Error Bar Plot of Averages with Standard Deviations")
-plt.legend()
-
-fig.savefig("comparative.png")
-
+# x_values = range(len(df))
+#
+# # Create the error bar plot
+# fig, axs = plt.subplots(ncols=1, figsize=(8, 8))
+# plt.errorbar(
+#     x_values,
+#     df["Average"],
+#     yerr=df["StandardDeviation"],
+#     fmt="o",
+#     capsize=5,
+#     capthick=2,
+#     ecolor="red",
+#     label="Average with Std Dev",
+# )
+#
+# # Adding labels and title
+# plt.xlabel("Model")
+# plt.ylabel("Average")
+# plt.title("Error Bar Plot of Averages with Standard Deviations")
+# plt.legend()
+#
+# fig.savefig("comparative.png")
+#
 # # Save the best model overall (based on average MSE across folds)
 # best_model_overall = (
 #     create_model_1() if best_model_name == "create_model_1" else create_model_2()
